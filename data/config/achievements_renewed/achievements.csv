@@ -1,0 +1,11 @@
+id,name,hint,howTo,description,icon,category,goal,secret,reward,chain,step,after,script,requiredMod,order,mod
+acr_level5,Reach level 5,Learn the ropes.,Reach level 5.,,graphics/icons/skills/leadership.png,Captain,5,,,Rank,1,,level,,10,
+acr_level10,Reach level 10,Keep climbing.,Reach level 10.,,graphics/icons/skills/leadership.png,Captain,10,,,Rank,2,acr_level5,level,,11,
+acr_level15,Reach level 15,Reach the top.,Reach level 15.,,graphics/icons/skills/leadership.png,Captain,15,,,Rank,3,acr_level10,level,,12,
+acr_systems25,Enter 25 star systems,See what is out there.,Enter 25 star systems in one campaign.,,graphics/icons/skills/navigation.png,Captain,25,,,,,,achievementsrenewed.scripts.StarSystemsEntered,,20,
+acr_wins10,Win 10 battles,Win your first fights.,Win 10 battles in one campaign.,,graphics/icons/skills/combat.png,Battles,10,,,Battle record,1,,wins,,30,
+acr_wins50,Win 50 battles,Keep winning.,Win 50 battles in one campaign.,,graphics/icons/skills/combat.png,Battles,50,,,Battle record,2,acr_wins10,wins,,31,
+acr_wins200,Win 200 battles,Make war a habit.,Win 200 battles in one campaign.,,graphics/icons/skills/combat.png,Battles,200,,,Battle record,3,acr_wins50,wins,,32,
+acr_remnant10,Defeat 10 Remnant fleets,Silence the old machines.,Win 10 battles against Remnant fleets in one campaign.,,graphics/icons/skills/cybernetic_augmentation.png,Battles,10,,,,,,wins:remnant,,40,
+acr_capital,Command a capital ship,Think bigger.,Have a capital ship in your fleet.,,graphics/icons/skills/best_of_the_best.png,Fleet,,,,,,,achievementsrenewed.scripts.CapitalShip,,50,
+acr_automated,Field an automated ship,Crew is optional.,Have an automated ship in your fleet.,,graphics/icons/skills/automated_ships.png,Fleet,,true,,,,,achievementsrenewed.scripts.AutomatedShip,,60,

@@ -1,0 +1,11 @@
+Achievements - Renewed
+by Oddisz
+
+The screen's drawing helpers come from Oddisz's own Gambling Den and Rule Book - Renewed.
+The base game achievements use icons that ship with Starsector, by path. The trophy icon is the mod's own.
+
+MagicLib (Wispborne and the modding community, MIT licence): when MagicLib is enabled, its achievements are
+read through its public classes and listed read-only. No MagicLib code or art is included.
+
+Quality Perks and Quality Captains (Dal): their milestones are listed read-only from the game's own skill
+list. No code or art of those mods is included.

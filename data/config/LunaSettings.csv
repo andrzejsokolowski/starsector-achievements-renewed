@@ -1,0 +1,4 @@
+fieldID,fieldName,fieldType,defaultValue,secondaryValue,fieldDescription,minValue,maxValue,tab
+acr_header_general,General Header,Header,Achievements,,,,,
+acr_showHowTo,Show how to get achievements,Boolean,false,,"The list shows the exact condition of every achievement you do not have yet, instead of its hint. Secret achievements and hidden steps are shown too.",,,
+acr_showMessage,Show a message on completion,Boolean,true,,"Shows a message on the campaign screen when you get an achievement. The entry in the intel log is added either way.",,,

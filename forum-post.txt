@@ -1,0 +1,70 @@
+Subject: [0.98a] Achievements - Renewed 0.1.0 - achievements with hints, chains and an API for modders
+
+[center][size=28pt][url=https://github.com/andrzejsokolowski/starsector-achievements-renewed/releases/latest][b]Achievements - Renewed[/b][/url][/size]
+[img]https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/graphics/achievements_renewed/icon.png[/img]
+[url=https://github.com/andrzejsokolowski/starsector-achievements-renewed/releases/latest][img]https://img.shields.io/github/downloads/andrzejsokolowski/starsector-achievements-renewed/total?style=for-the-badge&label=download[/img][/url]  [url=https://github.com/andrzejsokolowski/starsector-achievements-renewed][img]https://img.shields.io/github/v/release/andrzejsokolowski/starsector-achievements-renewed?display_name=tag&sort=semver&style=for-the-badge&label=source[/img][/url]
+[/center]
+[center][b]
+WHAT DOES THIS MOD DO?
+Achievements for the campaign, kept across all your saves.
+Each one starts greyed out with a hint. Once you get it, it shows what it was and what it unlocked.
+Other mods can add their own achievements and chains with one CSV file.
+Needs LunaLib.
+[/b][/center]
+
+[hr][center][size=12pt][b]How it works[/b][/size][/center][hr]
+[list]
+[li]Open the list from the Achievements entry on the intel screen.[/li]
+[li]An achievement you do not have shows a hint. The LunaLib setting "Show how to get achievements" shows the exact condition instead, secret ones included.[/li]
+[li]Counted achievements show your progress in the current save, for example "3 / 10".[/li]
+[li]Chains come in steps. A later step shows up when the one before it is done.[/li]
+[li]Getting one shows a message on the campaign screen and adds an entry to the intel log. A LunaLib setting turns the message off.[/li]
+[li]Done achievements count for every save.[/li]
+[/list]
+
+[hr][center][size=12pt][b]Achievements in this mod[/b][/size][/center][hr]
+[spoiler=The list (spoilers)]
+[list]
+[li][b]Rank[/b] (chain): reach level 5, then 10, then 15.[/li]
+[li]Enter 25 star systems in one campaign.[/li]
+[li][b]Battle record[/b] (chain): win 10, then 50, then 200 battles in one campaign.[/li]
+[li]Win 10 battles against Remnant fleets in one campaign.[/li]
+[li]Have a capital ship in your fleet.[/li]
+[li]One secret achievement.[/li]
+[/list]
+[/spoiler]
+
+[hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
+[list]
+[li][b]Rule Book - Renewed[/b]: its feats are achievements here, and each one names the rule it unlocks.[/li]
+[li][b]MagicLib[/b]: the Other mods tab lists the achievements of MagicLib mods (Nexerelin and others), read-only.[/li]
+[li][b]Quality Perks, Quality Captains[/b]: the Other mods tab lists their milestones.[/li]
+[/list]
+
+[hr][center][size=12pt][b]For modders[/b][/size][/center][hr]
+[list]
+[li]Add achievements with data/config/achievements_renewed/achievements.csv in your mod: name, hint, how-to line, icon, category, goal, secret, reward text, chain and step.[/li]
+[li]Check them without Java: a memory flag, the player's level, colonies, credits, or battles won against a faction. Or name a Java class.[/li]
+[li]Java API: isDone, progress, complete, addProgress, a listener for new achievements, and a call that opens the list.[/li]
+[li]Sector memory holds $acr_doneCount and $acr_totalCount for rules.csv.[/li]
+[li]The README on GitHub has the columns and examples.[/li]
+[/list]
+
+[hr][center][size=12pt][b]Credits[/b][/size][/center][hr]
+MagicLib by Wispborne and the modding community, Quality Perks and Quality Captains by Dal: only read, nothing of theirs is included.
+
+[spoiler=AI use disclaimer]Some or all assets and code in this mod were created using AI tools:
+[list]
+[li]Code: Claude Code (Claude Fable 5.2)[/li]
+[li]Text (achievement texts, readme and this post): Claude Code (Claude Fable 5.2)[/li]
+[li]Trophy icon: drawn by a script written by Claude Code (Claude Fable 5.2)[/li][/list]
+[/spoiler]
+
+[spoiler=License]
+This mod is under the CC0 (Creative Commons Zero) License, allowing you to do whatever you want with the code, without giving any credit to anyone.
+[/spoiler]
+
+[spoiler=Version log]
+[b]0.1.0[/b]
+[list][li]First public release.[/li][li]Achievements entry on the intel screen, with a button that opens the list.[/li][li]Every achievement starts greyed out with a hint. Once done it shows its name, what it was for and what it gave. A LunaLib setting shows the exact conditions instead of the hints.[/li][li]Achievements are kept across all saves. Counted ones show their progress in the current save.[/li][li]Chains: steps that show up one after another.[/li][li]A campaign message and an intel log entry when an achievement is done. A LunaLib setting turns the message off.[/li][li]10 achievements for the base game.[/li][li]Other mods can add achievements with a CSV file and a small Java API.[/li][li]With MagicLib installed, the Other mods tab lists the achievements of MagicLib mods such as Nexerelin. It also lists the milestones of Quality Perks and Quality Captains.[/li][/list]
+[/spoiler]

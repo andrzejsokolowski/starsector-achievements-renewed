@@ -1,0 +1,10 @@
+Version 0.1.0 (2026-11-10)
+- First public release.
+- Achievements entry on the intel screen, with a button that opens the list.
+- Every achievement starts greyed out with a hint. Once done it shows its name, what it was for and what it gave. A LunaLib setting shows the exact conditions instead of the hints.
+- Achievements are kept across all saves. Counted ones show their progress in the current save.
+- Chains: steps that show up one after another.
+- A campaign message and an intel log entry when an achievement is done. A LunaLib setting turns the message off.
+- 10 achievements for the base game.
+- Other mods can add achievements with a CSV file and a small Java API.
+- With MagicLib installed, the Other mods tab lists the achievements of MagicLib mods such as Nexerelin. It also lists the milestones of Quality Perks and Quality Captains.

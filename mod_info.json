@@ -1,0 +1,20 @@
+{
+  "id": "achievements_renewed",
+  "name": "Achievements - Renewed",
+  "author": "Oddisz",
+  "utility": "false",
+  "version": "0.1.0",
+  "description": "Achievements for the campaign, kept across all your saves. Each one starts as a hint and shows what it was once you get it. Other mods can add their own achievements and chains through a CSV file and a small API. With MagicLib installed, the list also shows the achievements of MagicLib mods such as Nexerelin.",
+  "gameVersion": "0.98a-RC8",
+  "jars": ["jars/AchievementsRenewed.jar"],
+  "modPlugin": "achievementsrenewed.AchievementsModPlugin",
+  "updateCheckURL": "https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/achievements_renewed.version",
+  "originalGameVersion": "0.98a-RC8",
+  "dependencies": [
+    {
+      "id": "lunalib",
+      "name": "LunaLib",
+      "version": { "major": "2", "minor": "0", "patch": "0" }
+    }
+  ]
+}
