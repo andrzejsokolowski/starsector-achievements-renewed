@@ -36,8 +36,8 @@ Needs LunaLib.
 
 [hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
 [list]
-[li][b]Rule Book - Renewed[/b]: its feats are achievements here, and each one names the rule it unlocks.[/li]
-[li][b]New Game Plus - Renewed[/b]: adds its own achievements.[/li]
+[li][b]Rule Book - Renewed[/b]: adds achievements for story missions and for other mods, each in its own tab, and its challenges in a tab of its own. Many unlock a rule, and say which once done.[/li]
+[li][b]New Game Plus - Renewed[/b]: its feats are achievements here, and every achievement pays career points there, once per profile.[/li]
 [li][b]MagicLib[/b]: the achievements of MagicLib mods (Nexerelin and others) are listed read-only, each mod in its own tab.[/li]
 [li][b]Quality Perks, Quality Captains[/b]: their milestones are listed read-only in their own tab.[/li]
 [/list]
@@ -57,9 +57,9 @@ MagicLib by Wispborne and the modding community, Quality Perks and Quality Capta
 
 [spoiler=AI use disclaimer]Some or all assets and code in this mod were created using AI tools:
 [list]
-[li]Code: Claude Code (Claude Fable 5.2)[/li]
-[li]Text (achievement texts, readme and this post): Claude Code (Claude Fable 5.2)[/li]
-[li]Trophy icon: drawn by a script written by Claude Code (Claude Fable 5.2)[/li][/list]
+[li]Code: Claude Code (Claude Fable 5.2, Claude Opus 5.5)[/li]
+[li]Text (achievement texts, readme and this post): Claude Code (Claude Fable 5.2, Claude Opus 5.5)[/li]
+[li]Icons: drawn by scripts written by Claude Code (Claude Fable 5.2, Claude Opus 5.5)[/li][/list]
 [/spoiler]
 
 [spoiler=License]
@@ -67,6 +67,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.2.2[/b]
+[list][li]The mod now has its forum topic. Mod managers link to it.[/li][/list]
 [b]0.2.1[/b]
 [list][li]New gold icon in mod managers (TriOS) and in LunaLib's settings.[/li][/list]
 [b]0.2.0[/b]

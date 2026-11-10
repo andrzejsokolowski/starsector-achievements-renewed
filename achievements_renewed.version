@@ -1,11 +1,12 @@
 {
 	"masterVersionFile":"https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/achievements_renewed.version",
 	"changelogURL":"https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/changelog.txt",
+	"modThreadId":36288,
 	"modName":"Achievements - Renewed",
 	"modVersion": {
 		"major":0,
 		"minor":2,
-		"patch":1
+		"patch":2
 	},
 	"starsectorVersion":"0.98a-RC8",
 	"directDownloadURL":"https://github.com/andrzejsokolowski/starsector-achievements-renewed/releases/latest/download/AchievementsRenewed.zip"
