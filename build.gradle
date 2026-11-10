@@ -216,7 +216,7 @@ tasks.named('check') {
 // Only what the game loads, plus the credits and the licence.
 def releaseFiles = copySpec {
     from(projectDir) {
-        include 'mod_info.json', 'achievements_renewed.version', 'CREDITS.txt', 'LICENSE'
+        include 'mod_info.json', 'achievements_renewed.version', 'CREDITS.txt', 'LICENSE', 'icon.png'
         include 'data/**', 'graphics/**', 'jars/AchievementsRenewed.jar'
     }
 }

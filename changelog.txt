@@ -1,3 +1,6 @@
+Version 0.2.1 (2026-11-10)
+- New gold icon in mod managers (TriOS) and in LunaLib's settings.
+
 Version 0.2.0 (2026-11-10)
 - The list has a column of tabs. The first tab, Achievements, holds base game achievements only. Every mod with achievements has its own tab, in alphabetical order, with its done and total count.
 - The Other mods tab is gone. MagicLib achievements and the Quality Perks milestones sit in the tab of the mod they come from.

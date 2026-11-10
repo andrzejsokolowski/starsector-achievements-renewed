@@ -1,5 +1,5 @@
 [center][size=28pt][url=https://github.com/andrzejsokolowski/starsector-achievements-renewed/releases/latest][b]Achievements - Renewed[/b][/url][/size]
-[img]https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/graphics/achievements_renewed/icon.png[/img]
+[img width=128]https://raw.githubusercontent.com/andrzejsokolowski/starsector-achievements-renewed/main/icon.png[/img]
 [url=https://github.com/andrzejsokolowski/starsector-achievements-renewed/releases/latest][img]https://img.shields.io/github/downloads/andrzejsokolowski/starsector-achievements-renewed/total?style=for-the-badge&label=download[/img][/url]  [url=https://github.com/andrzejsokolowski/starsector-achievements-renewed][img]https://img.shields.io/github/v/release/andrzejsokolowski/starsector-achievements-renewed?display_name=tag&sort=semver&style=for-the-badge&label=source[/img][/url]
 [/center]
 [center][b]
@@ -67,6 +67,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.2.1[/b]
+[list][li]New gold icon in mod managers (TriOS) and in LunaLib's settings.[/li][/list]
 [b]0.2.0[/b]
 [list][li]The list has a column of tabs. The first tab, Achievements, holds base game achievements only. Every mod with achievements has its own tab, in alphabetical order, with its done and total count.[/li][li]The Other mods tab is gone. MagicLib achievements and the Quality Perks milestones sit in the tab of the mod they come from.[/li][li]For modders: new tab column (empty: a tab named after your mod, any text: that tab, vanilla: the first tab) and Builder.tab. requiredMod takes & between groups: a|b&c|d means (a or b) and (c or d).[/li][li]For modders: new built-in check industry:<id>, with optional AI core and special item: industry:<id>:<core>:<item>.[/li][li]When one check completes more than three achievements, three messages show and one line counts the rest. The file in saves/common is written once for all of them.[/li][li]Fixed: a built-in check with a dot in its key, such as memory:$my.key, was taken for a class name and the row was left out.[/li][li]The intel entry lists the counts per tab. An achievement's intel entry names its tab.[/li][li]Licence: CC0 1.0, in a LICENSE file.[/li][/list]
 [b]0.1.0[/b]
