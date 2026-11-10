@@ -19,8 +19,10 @@ rename or remove. New Game Plus - Renewed 0.6.0 uses `register`, `get`, `complet
 and the listener, so those are contract too.
 
 This mod itself pays nothing: no career points, no rewards. A mod that wants to reward an achievement does
-it in its own listener. New Game Plus - Renewed pays career points that way, once per profile, for its own
-`ngp_*` achievements and for ten of Rule Book's (as its session reported Andrzej's decision of 2026-11-10).
+it in its own listener. New Game Plus - Renewed (0.7.0 on) pays career points that way, once per profile, for
+every achievement of every mod except Rule Book's challenges (as its session reported Andrzej's decision of
+2026-11-10). So an achievement's id and condition are a promise to players' career totals: do not rename
+ids or quietly change what an achievement asks for.
 
 ## Tabs
 
