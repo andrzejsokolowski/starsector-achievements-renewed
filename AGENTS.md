@@ -46,6 +46,9 @@ and three icons that were Rule Book art changed). Their checks are `scripts/Feat
 pays once per id and Rule Book unlocks rules from them. The 13 `rbr_challenge_*` rows stay in Rule Book,
 which completes them with `Achievements.complete`. Rows that name a Rule Book rule in `reward` carry
 `rewardMod` = `rulebook_renewed`. Checks about other mods read only what those mods leave in the save.
+0.3.1 (Andrzej, "Yes, fix them"): `rbr_chicken` and `rbr_chicken_market` are gone (Chicken is in no mod any
+more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everything Shop
+(`the_everything_shop`), with the old Extra Submarkets id and its Gilgamesh Nebula still counting.
 
 ## Writing
 

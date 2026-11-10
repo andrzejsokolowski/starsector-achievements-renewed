@@ -41,7 +41,7 @@ Needs LunaLib.
 [hr][center][size=12pt][b]Achievements for other mods[/b][/size][/center][hr]
 [list]
 [li]Some mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
-[li]For example: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, StarterPack, Missions - Renewed, Astral Ascension Renewed, Omega Core Everywhere and New Game Plus - Renewed.[/li]
+[li]For example: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, StarterPack, Missions - Renewed, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
 [/list]
 
 [hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
@@ -77,6 +77,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.3.1[/b]
+[list][li]Visit the Great Mall is now Visit the Gate of Babylon, for The Everything Shop (the older Extra Submarkets still counts). It sits in The Everything Shop's tab.[/li][li]The two Chicken's Tech Shop achievements are gone.[/li][/list]
 [b]0.3.0[/b]
 [list][li]45 more achievements, taken over from Rule Book - Renewed with the same names and conditions: 26 for the base game (story missions, colonies, a million credits, battles) and 19 for other mods, each in the tab of its mod. Achievements you already have stay done.[/li][li]Their reward lines, such as "Unlocks the rule Ludd's Song", show only while Rule Book - Renewed is on.[/li][li]For modders: new column rewardMod. The reward text shows only while that mod is on (same form as requiredMod).[/li][/list]
 [b]0.2.2[/b]

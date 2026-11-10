@@ -22,7 +22,7 @@ import achievementsrenewed.SaveData;
 
 /**
  * The checks of the rbr_* achievements, which came from Rule Book - Renewed 0.10.3 (its Feats class)
- * with their ids and conditions unchanged: New Game Plus - Renewed pays career points once per id, and
+ * with their ids unchanged: New Game Plus - Renewed pays career points once per id, and
  * Rule Book unlocks its rules from them. Never rename an id here or change what it asks for.
  *
  * Story checks read the game's own mission flags (the _missionCompleted keys the vanilla missions set
@@ -92,12 +92,8 @@ public final class Feats {
         flag("rbr_aar_ascended", () -> playerMarketMemory("$aar_ascended"));
         flag("rbr_aar_ecumenopolis", () -> playerCondition("aar_ecumenopolis"));
         flag("rbr_oce_tutelage", () -> officerMemory("$oce_omegaTutelage"));
-        flag("rbr_chicken", () -> sector("$CTS_ChickenIntroComplete"));
-        flag("rbr_chicken_market", () -> sectorNumber("$cts_techMarketLevel") >= 5f);
-        flag("rbr_great_mall", () -> {
-            StarSystemAPI system = Global.getSector().getStarSystem("Gilgamesh Nebula");
-            return system != null && system.isEnteredByPlayer();
-        });
+        // The Everything Shop's nebula; Extra Submarkets, the mod it came from, called it the Gilgamesh Nebula.
+        flag("rbr_great_mall", () -> enteredSystem("Gate of Babylon") || enteredSystem("Gilgamesh Nebula"));
         // New Game Plus - Renewed 0.7.2 sets $ngp_usedConsumable when any of its ship items is fitted; older
         // versions only leave the hull mod of the S-mod slot and Stat tuning items.
         flag("rbr_ngp_ledger", () -> sector("$ngp_usedConsumable") || fleetHasPermaMod("ngp_ledger_refit"));
@@ -141,9 +137,9 @@ public final class Feats {
         return value == null ? null : value.toString();
     }
 
-    private static float sectorNumber(String key) {
-        Object value = Global.getSector().getMemoryWithoutUpdate().get(key);
-        return value instanceof Number ? ((Number) value).floatValue() : 0f;
+    private static boolean enteredSystem(String name) {
+        StarSystemAPI system = Global.getSector().getStarSystem(name);
+        return system != null && system.isEnteredByPlayer();
     }
 
     private static int sectorSetSize(String key) {
