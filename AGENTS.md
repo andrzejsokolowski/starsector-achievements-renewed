@@ -17,6 +17,9 @@ Rule Book - Renewed and New Game Plus - Renewed (`ngp_renewed`) use this mod's A
 `$acr_doneCount` and `$acr_totalCount`, and the file name in saves/common are a contract: add to them, never
 rename or remove. New Game Plus - Renewed 0.6.0 uses `register`, `get`, `complete`, `AchievementSpec.builder`
 and the listener, so those are contract too.
+Rule Book - Renewed 0.11.0 reads `data/config/achievements_renewed/achievements.csv` of this mod (next door, or
+the installed copy) in its build to check the `rbr_*` ids, and needs this mod 0.3.0 or newer: keep that path and
+the script name `achievementsrenewed.scripts.FeatScript`.
 
 This mod itself pays nothing: no career points, no rewards. A mod that wants to reward an achievement does
 it in its own listener. New Game Plus - Renewed (0.7.0 on) pays career points that way, once per profile, for
