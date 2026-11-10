@@ -54,7 +54,7 @@ public final class Achievements {
         return id == null ? null : Catalog.get(id);
     }
 
-    /** Only achievements whose required mod is on, in list order. */
+    /** Only achievements whose required mods are on, in list order (tab by tab). */
     public static List<AchievementSpec> all() {
         return Catalog.all();
     }
@@ -102,6 +102,20 @@ public final class Achievements {
      */
     public static void register(AchievementSpec spec) {
         Catalog.register(spec);
+    }
+
+    /**
+     * The titles of the tabs of the list, in list order: "Achievements" (base game) first when it has any,
+     * then the others by name. Tabs that only hold the achievements of other systems (MagicLib) are not
+     * included.
+     */
+    public static List<String> tabs() {
+        return Catalog.tabs();
+    }
+
+    /** The achievements shown in one tab, by its title ("Achievements", "Cloning"). "vanilla" also names the first. */
+    public static List<AchievementSpec> ofTab(String tabName) {
+        return Catalog.ofTab(tabName);
     }
 
     /** The achievements of one chain, in step order. */

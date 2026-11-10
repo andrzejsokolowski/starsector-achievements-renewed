@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.util.Misc;
 
 import achievementsrenewed.api.AchievementListener;
 import achievementsrenewed.api.AchievementSpec;
@@ -29,6 +30,9 @@ public final class Tracker {
     /** Scripts that threw, so the log gets one line per achievement and not one per day. */
     private static final Set<String> FAILED = new HashSet<>();
     private static boolean checking;
+    /** Campaign messages one check may show; the rest of what it completes is summed up in one line. */
+    private static final int MESSAGES_PER_CHECK = 3;
+    private static int doneThisCheck;
 
     private Tracker() {}
 
@@ -66,6 +70,8 @@ public final class Tracker {
     public static void check() {
         if (Global.getSector() == null || checking) return;
         checking = true;
+        doneThisCheck = 0;
+        Store.hold(true);
         try {
             for (AchievementSpec spec : Catalog.all()) {
                 int count = spec.script != null ? poll(spec) : SaveData.get(Ids.DATA_COUNTS, spec.id);
@@ -73,6 +79,18 @@ public final class Tracker {
             }
         } finally {
             checking = false;
+            Store.hold(false);
+        }
+        // An old save can earn dozens at once: three messages, then one line for the rest.
+        int more = doneThisCheck - MESSAGES_PER_CHECK;
+        if (more > 0 && Settings.showMessage()) {
+            try {
+                Global.getSector().getCampaignUI().addMessage(
+                        more + (more == 1 ? " more achievement done" : " more achievements done"),
+                        Misc.getHighlightColor());
+            } catch (Throwable t) {
+                // No campaign screen to show it on; the intel entries are there all the same.
+            }
         }
     }
 
@@ -115,8 +133,9 @@ public final class Tracker {
                 LOG.error("Achievements: a listener failed on " + spec.id, t);
             }
         }
+        boolean quiet = checking && ++doneThisCheck > MESSAGES_PER_CHECK;
         try {
-            IntelKeeper.addNotice(spec);
+            IntelKeeper.addNotice(spec, quiet);
         } catch (Throwable t) {
             LOG.error("Achievements: could not add the intel entry for " + spec.id, t);
         }

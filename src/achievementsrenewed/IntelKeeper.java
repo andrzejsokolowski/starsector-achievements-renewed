@@ -105,12 +105,15 @@ public final class IntelKeeper {
         intel.setNew(isNew);
     }
 
-    /** An achievement was just done: its intel entry, with a campaign message unless that is switched off. */
-    public static void addNotice(AchievementSpec spec) {
+    /**
+     * An achievement was just done: its intel entry, with a campaign message unless that is switched off
+     * or the caller asks for none.
+     */
+    public static void addNotice(AchievementSpec spec, boolean quiet) {
         if (Global.getSector() == null || Global.getSector().getPlayerFleet() == null) return;
         long now = Global.getSector().getClock().getTimestamp();
         SaveData.notices().add(entry(now, spec.id));
-        Global.getSector().getIntelManager().addIntel(new AchievementNoticeIntel(spec, now), !Settings.showMessage());
+        Global.getSector().getIntelManager().addIntel(new AchievementNoticeIntel(spec, now), quiet || !Settings.showMessage());
     }
 
     /** The player deleted an entry, or it ran out: it does not come back on the next load. */

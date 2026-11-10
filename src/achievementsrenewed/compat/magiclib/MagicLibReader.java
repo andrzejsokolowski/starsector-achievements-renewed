@@ -40,7 +40,8 @@ public final class MagicLibReader implements ExternalSource {
                     progress = now == null ? 0 : Math.round(now);
                 }
                 out.add(new ExternalAchievement(achievement.getModName(), achievement.getName(),
-                        achievement.getDescription(), achievement.getImage(), done, hidden, progress, goal));
+                        achievement.getDescription(), achievement.getImage(), done, hidden, progress, goal,
+                        "MagicLib"));
             } catch (Throwable ignored) {
                 // One achievement with a broken script does not hide the rest.
             }

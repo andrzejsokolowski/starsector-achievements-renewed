@@ -72,7 +72,7 @@ public final class AchievementNoticeIntel extends BaseIntelPlugin {
         String body = body(spec);
         if (!body.isEmpty()) info.addPara(body, pad);
         if (!spec.reward.isEmpty()) info.addPara(spec.reward, Misc.getHighlightColor(), pad);
-        info.addPara(Catalog.modName(spec.modId), Misc.getGrayColor(), pad);
+        info.addPara(spec.tabName(), Misc.getGrayColor(), pad);
         info.addButton("Open the list", BUTTON_OPEN, width, 24f, pad * 2f);
         addDeleteButton(info, width);
     }

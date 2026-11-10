@@ -1,5 +1,7 @@
 package achievementsrenewed.api;
 
+import achievementsrenewed.Catalog;
+
 /**
  * One achievement. Immutable. Read from data/config/achievements_renewed/achievements.csv, or built in code
  * with {@link #builder} and handed to {@link Achievements#register}.
@@ -8,6 +10,10 @@ public final class AchievementSpec {
 
     /** The icon used when a row names none. */
     public static final String DEFAULT_ICON = "graphics/achievements_renewed/icon.png";
+    /** The tab value that puts an achievement in the first tab, which holds base game achievements only. */
+    public static final String VANILLA_TAB = "vanilla";
+    /** The title of that first tab. */
+    public static final String VANILLA_TAB_NAME = "Achievements";
 
     public final String id;
     /** The mod whose CSV defined it (or the mod named when it was built in code). */
@@ -22,7 +28,7 @@ public final class AchievementSpec {
     public final String description;
     /** Sprite path. */
     public final String icon;
-    /** Heading inside the mod's group. May be empty. */
+    /** Heading inside the tab. May be empty. */
     public final String category;
     /** Count needed, at least 1. Above 1 the list shows progress, for example "3 / 10". */
     public final int goal;
@@ -38,8 +44,14 @@ public final class AchievementSpec {
     public final String after;
     /** Null when the achievement is driven from code with complete or addProgress. */
     public final AchievementScript script;
-    /** Sort order inside the mod's group; lower comes first. */
+    /** Sort order inside the tab; lower comes first. */
     public final float order;
+    /**
+     * The tab of the list it is shown in: "vanilla" for the first tab (base game achievements only), any
+     * other text is the tab's title ("Cloning"), empty means the name of the mod that defined it. See
+     * {@link #tabName()} for the title this comes to.
+     */
+    public final String tab;
 
     private AchievementSpec(Builder b) {
         id = b.id;
@@ -58,6 +70,7 @@ public final class AchievementSpec {
         after = b.after;
         script = b.script;
         order = b.order;
+        tab = b.tab.equalsIgnoreCase(VANILLA_TAB) ? VANILLA_TAB : b.tab;
     }
 
     /** Done in any save. */
@@ -77,6 +90,20 @@ public final class AchievementSpec {
         return after.isEmpty() || Achievements.get(after) == null || Achievements.isDone(after);
     }
 
+    /** True when it sits in the first tab, with the base game achievements. */
+    public boolean isVanilla() {
+        return VANILLA_TAB.equals(tab);
+    }
+
+    /**
+     * The title of the tab it is shown in: "Achievements" for a vanilla one, the tab text when there is
+     * one, otherwise the name of the mod that defined it.
+     */
+    public String tabName() {
+        if (isVanilla()) return VANILLA_TAB_NAME;
+        return tab.isEmpty() ? Catalog.modName(modId) : tab;
+    }
+
     /** True when the goal is above 1, so the list shows progress. */
     public boolean isCounted() {
         return goal > 1;
@@ -94,7 +121,7 @@ public final class AchievementSpec {
 
     public static final class Builder {
         private final String id, modId, name;
-        private String hint = "", howTo = "", description = "", icon = "", category = "", reward = "", chain = "", after = "";
+        private String hint = "", howTo = "", description = "", icon = "", category = "", reward = "", chain = "", after = "", tab = "";
         private int goal = 1, step;
         private boolean secret;
         private AchievementScript script;
@@ -124,6 +151,8 @@ public final class AchievementSpec {
         public Builder after(String after) { this.after = clean(after); return this; }
         public Builder script(AchievementScript script) { this.script = script; return this; }
         public Builder order(float order) { this.order = order; return this; }
+        /** "vanilla", a tab title, or empty for the name of the mod. */
+        public Builder tab(String tab) { this.tab = clean(tab); return this; }
 
         public AchievementSpec build() {
             return new AchievementSpec(this);

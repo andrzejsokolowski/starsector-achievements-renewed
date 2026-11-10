@@ -1,7 +1,6 @@
 package achievementsrenewed;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import com.fs.starfarer.api.ui.Alignment;
@@ -15,7 +14,7 @@ import achievementsrenewed.api.AchievementSpec;
 import achievementsrenewed.api.Achievements;
 
 /**
- * The permanent Achievements entry on the intel screen: the counts per mod and a button that opens the
+ * The permanent Achievements entry on the intel screen: the counts per tab and a button that opens the
  * list. Never saved: IntelKeeper takes it out before a save and puts it back after.
  */
 public final class AchievementsIntel extends BaseIntelPlugin {
@@ -50,19 +49,18 @@ public final class AchievementsIntel extends BaseIntelPlugin {
         float pad = 10f;
         info.addPara(Achievements.doneCount() + " / " + Achievements.totalCount() + " done", Misc.getHighlightColor(), pad);
 
-        // Done and total per mod, in list order.
-        Map<String, int[]> perMod = new LinkedHashMap<>();
-        for (AchievementSpec spec : Achievements.all()) {
-            int[] counts = perMod.computeIfAbsent(spec.modId, id -> new int[2]);
-            if (spec.isDone()) counts[0]++;
-            counts[1]++;
-        }
-        if (perMod.size() > 1) {
-            info.addSectionHeading("By mod", Alignment.MID, pad);
-            for (Map.Entry<String, int[]> e : perMod.entrySet()) {
-                int[] counts = e.getValue();
-                info.addPara(Catalog.modName(e.getKey()) + "   " + counts[0] + " / " + counts[1],
-                        counts[0] >= counts[1] ? Misc.getPositiveHighlightColor() : Misc.getTextColor(), 5f);
+        // Done and total per tab, in list order.
+        List<String> tabs = Achievements.tabs();
+        if (tabs.size() > 1) {
+            info.addSectionHeading("By tab", Alignment.MID, pad);
+            for (String tab : tabs) {
+                int done = 0, total = 0;
+                for (AchievementSpec spec : Achievements.ofTab(tab)) {
+                    if (spec.isDone()) done++;
+                    total++;
+                }
+                info.addPara(tab + "   " + done + " / " + total,
+                        done >= total ? Misc.getPositiveHighlightColor() : Misc.getTextColor(), 5f);
             }
         }
 

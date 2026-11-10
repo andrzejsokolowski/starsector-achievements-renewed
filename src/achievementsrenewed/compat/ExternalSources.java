@@ -1,9 +1,7 @@
 package achievementsrenewed.compat;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -12,8 +10,9 @@ import com.fs.starfarer.api.Global;
 import achievementsrenewed.Ids;
 
 /**
- * Achievements kept by other systems, for the Other mods tab: MagicLib's (Nexerelin and others define
- * theirs through it) and the milestone skills of Quality Perks and Quality Captains.
+ * Achievements kept by other systems: MagicLib's (Nexerelin and others define theirs through it) and the
+ * milestone skills of Quality Perks and Quality Captains. The list shows each in the tab named after the
+ * mod it comes from.
  *
  * The MagicLib reader is the only class that names MagicLib. It is made by name, and only when the mod
  * MagicLib is enabled, so nothing here needs MagicLib to load.
@@ -42,12 +41,11 @@ public final class ExternalSources {
         return magicLib;
     }
 
-    /** Everything the other systems show, grouped by mod name; each group keeps its own order. */
+    /** Everything the other systems show, each system in its own order. */
     public static List<ExternalAchievement> readAll() {
         List<ExternalAchievement> out = new ArrayList<>();
         read(magicLib(), out, "MagicLib");
         read(new MilestoneSkillReader(), out, "milestone skills");
-        out.sort(Comparator.comparing((ExternalAchievement a) -> a.group.toLowerCase(Locale.ROOT)));
         return out;
     }
 

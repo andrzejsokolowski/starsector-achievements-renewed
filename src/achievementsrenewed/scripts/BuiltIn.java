@@ -5,8 +5,11 @@ import java.util.Map;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.SpecialItemData;
+import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.util.Misc;
 
 import achievementsrenewed.Ids;
 import achievementsrenewed.SaveData;
@@ -23,19 +26,25 @@ import achievementsrenewed.api.AchievementScript;
  *   credits              the player's credits
  *   wins                 battles the player's side won in this save; wins:station against a station;
  *                        wins:<faction id> against a fleet of that faction
+ *   industry:id          player colonies with that industry built; industry:id:core:item also asks for
+ *                        that AI core and that special item in it (an empty part means any, so
+ *                        industry:id::item asks for the item only)
  *
- * Anything with a dot in it is a class name and is not handled here.
+ * Text that does not start with one of these words is a class name and is not handled here. A key or id
+ * after the colon may hold dots.
  */
 public final class BuiltIn {
 
     private BuiltIn() {}
 
     /** The script for this column text, or null when the text names a class. Throws on an unknown word. */
+    // Words: memory, player_memory, persistent, level, colonies, credits, wins, industry.
     public static AchievementScript parse(String text) {
-        if (text.contains(".")) return null;
         int split = text.indexOf(':');
         String word = (split < 0 ? text : text.substring(0, split)).trim();
         String arg = split < 0 ? "" : text.substring(split + 1).trim();
+        // A class name has dots and no colon. A built-in word has no dot; its argument may.
+        if (word.contains(".")) return null;
         switch (word) {
             case "memory":
                 needsArgument(word, arg);
@@ -71,9 +80,36 @@ public final class BuiltIn {
                 String key = arg.isEmpty() ? WINS_ALL : arg.equals("station") ? WINS_STATION : WINS_FACTION + arg;
                 return spec -> SaveData.get(Ids.DATA_WINS, key);
             }
+            case "industry": {
+                String[] parts = arg.split(":", -1);
+                String industryId = parts[0].trim();
+                String coreId = parts.length > 1 ? parts[1].trim() : "";
+                String itemId = parts.length > 2 ? parts[2].trim() : "";
+                if (industryId.isEmpty()) throw new IllegalArgumentException("industry needs an id, as industry:id");
+                return spec -> industries(industryId, coreId, itemId);
+            }
             default:
                 throw new IllegalArgumentException("unknown script " + text);
         }
+    }
+
+    /**
+     * Player colonies with this industry, built (not still under its first construction), and with this AI
+     * core and this special item installed when those are named.
+     */
+    private static int industries(String industryId, String coreId, String itemId) {
+        int found = 0;
+        for (MarketAPI market : Misc.getPlayerMarkets(false)) {
+            Industry industry = market.getIndustry(industryId);
+            if (industry == null || (industry.isBuilding() && !industry.isUpgrading())) continue;
+            if (!coreId.isEmpty() && !coreId.equals(industry.getAICoreId())) continue;
+            if (!itemId.isEmpty()) {
+                SpecialItemData item = industry.getSpecialItem();
+                if (item == null || !itemId.equals(item.getId())) continue;
+            }
+            found++;
+        }
+        return found;
     }
 
     public static final String WINS_ALL = "all";

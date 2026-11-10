@@ -1,6 +1,8 @@
 Achievements - Renewed
 by Oddisz
 
+Licence: CC0 1.0 Universal (see LICENSE). Do what you like with it.
+
 The screen's drawing helpers come from Oddisz's own Gambling Den and Rule Book - Renewed.
 The base game achievements use icons that ship with Starsector, by path. The trophy icon is the mod's own.
 

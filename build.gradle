@@ -158,7 +158,7 @@ tasks.register('checkReleaseFiles') {
         def lines = listFile.readLines('UTF-8')
         def header = lines[0].split(',', -1) as List
         def columns = ['id', 'name', 'hint', 'howTo', 'description', 'icon', 'category', 'goal', 'secret', 'reward',
-                       'chain', 'step', 'after', 'script', 'requiredMod', 'order', 'mod']
+                       'chain', 'step', 'after', 'script', 'requiredMod', 'order', 'mod', 'tab']
         columns.each { if (!header.contains(it)) problems << "achievements.csv has no ${it} column" }
         def parseCsv = { String line ->
             def out = []; def cur = new StringBuilder(); boolean q = false
@@ -173,7 +173,7 @@ tasks.register('checkReleaseFiles') {
             }
             out << cur.toString(); out
         }
-        def builtIns = ['memory', 'player_memory', 'persistent', 'level', 'colonies', 'credits', 'wins']
+        def builtIns = ['memory', 'player_memory', 'persistent', 'level', 'colonies', 'credits', 'wins', 'industry']
         def rows = [:]
         lines.drop(1).findAll { it.trim() && !it.startsWith('#') }.each { line ->
             def cells = parseCsv(line)
@@ -188,12 +188,15 @@ tasks.register('checkReleaseFiles') {
             if (row.step && !(row.step ==~ /\d+/)) problems << "achievements.csv ${row.id}: step must be a whole number"
             if (row.secret && !(row.secret.toLowerCase() in ['true', 'false'])) problems << "achievements.csv ${row.id}: secret must be true or false"
             if (row.script) {
-                if (row.script.contains('.')) {
+                def word = row.script.split(':')[0]
+                if (word.contains('.')) {
                     if (!file("src/${row.script.replace('.', '/')}.java").isFile()) problems << "achievements.csv ${row.id}: script class ${row.script} not found"
-                } else if (!(row.script.split(':')[0] in builtIns)) {
+                } else if (!(word in builtIns)) {
                     problems << "achievements.csv ${row.id}: unknown built-in script ${row.script}"
                 }
             }
+            // This mod's own achievements are for the base game, so they all sit in the first tab.
+            if (row.tab != 'vanilla') problems << "achievements.csv ${row.id}: tab must be vanilla"
         }
         rows.each { id, row ->
             if (row.after && !rows.containsKey(row.after)) problems << "achievements.csv ${id}: after names unknown achievement ${row.after}"
@@ -210,10 +213,10 @@ tasks.named('check') {
             tasks.named('checkVersionMetadata'), tasks.named('checkReleaseFiles')
 }
 
-// Only what the game loads, plus the credits file.
+// Only what the game loads, plus the credits and the licence.
 def releaseFiles = copySpec {
     from(projectDir) {
-        include 'mod_info.json', 'achievements_renewed.version', 'CREDITS.txt'
+        include 'mod_info.json', 'achievements_renewed.version', 'CREDITS.txt', 'LICENSE'
         include 'data/**', 'graphics/**', 'jars/AchievementsRenewed.jar'
     }
 }

@@ -22,7 +22,7 @@ import achievementsrenewed.scripts.BuiltIn;
 
 /**
  * Every achievement the game can offer: the rows of data/config/achievements_renewed/achievements.csv,
- * merged over all mods, plus the ones mods register from code. Rows whose required mod is off are left
+ * merged over all mods, plus the ones mods register from code. Rows whose required mods are off are left
  * out before their script class is loaded. A broken row is logged and skipped.
  *
  * The list is read the first time anything asks for it, so a mod that loads before this one can already
@@ -68,7 +68,7 @@ public final class Catalog {
     }
 
     private static AchievementSpec parse(JSONObject row, String id, List<ModSpecAPI> mods) {
-        if (!anyModEnabled(str(row, "requiredMod"))) return null;
+        if (!modsEnabled(str(row, "requiredMod"))) return null;
 
         String name = str(row, "name");
         if (name.isEmpty()) throw new IllegalArgumentException("no name");
@@ -103,6 +103,7 @@ public final class Catalog {
                 .after(str(row, "after"))
                 .script(script)
                 .order(orderText.isEmpty() ? 1000f : Float.parseFloat(orderText))
+                .tab(str(row, "tab"))
                 .build();
     }
 
@@ -143,13 +144,26 @@ public final class Catalog {
         return t.equals("true") || t.equals("yes") || t.equals("1");
     }
 
-    /** True when the column is empty or names (with | between them) at least one enabled mod. */
+    /** The 0.1.0 name of {@link #modsEnabled}, kept for anything compiled against it. */
     public static boolean anyModEnabled(String mods) {
+        return modsEnabled(mods);
+    }
+
+    /**
+     * Whether a requiredMod column is met. Empty: yes. "a|b": a or b is enabled. "a|b&c|d": (a or b) and
+     * (c or d). An empty group counts as met.
+     */
+    public static boolean modsEnabled(String mods) {
         if (mods == null || mods.trim().isEmpty()) return true;
-        for (String mod : mods.split("[|]")) {
-            if (!mod.trim().isEmpty() && Global.getSettings().getModManager().isModEnabled(mod.trim())) return true;
+        for (String group : mods.split("&")) {
+            if (group.trim().isEmpty()) continue;
+            boolean any = false;
+            for (String mod : group.split("[|]")) {
+                if (!mod.trim().isEmpty() && Global.getSettings().getModManager().isModEnabled(mod.trim())) any = true;
+            }
+            if (!any) return false;
         }
-        return false;
+        return true;
     }
 
     /** The bundled org.json returns the string "null" for a JSON null, so check isNull first. */
@@ -179,26 +193,26 @@ public final class Catalog {
     }
 
     /**
-     * List order: this mod's own achievements first, then the other mods by name. Inside a mod: categories
-     * in the order of their first achievement, then chains (and single achievements) in the order of their
-     * first member, a chain's steps in step order.
+     * List order: the vanilla tab first, then the other tabs by title, so no mod comes before another for
+     * any reason but the title of its tab. Inside a tab: categories in the order of their first
+     * achievement, then chains (and single achievements) in the order of their first member, the steps of
+     * a chain in step order.
      */
     private static void resort() {
         List<AchievementSpec> list = new ArrayList<>(SPECS.values());
         Map<String, Float> categoryOrder = new HashMap<>();
         Map<String, Float> groupOrder = new HashMap<>();
-        Map<String, String> names = new HashMap<>();
+        Map<String, String> tabs = new HashMap<>();
+        for (AchievementSpec s : list) tabs.put(s.id, tabKey(s.tabName()));
         for (AchievementSpec s : list) {
-            categoryOrder.merge(categoryKey(s), s.order, Math::min);
-            groupOrder.merge(groupKey(s), s.order, Math::min);
-            if (!names.containsKey(s.modId)) names.put(s.modId, modName(s.modId).toLowerCase(Locale.ROOT));
+            categoryOrder.merge(categoryKey(s, tabs), s.order, Math::min);
+            groupOrder.merge(groupKey(s, tabs), s.order, Math::min);
         }
-        list.sort(Comparator.comparing((AchievementSpec s) -> !Ids.MOD_ID.equals(s.modId))
-                .thenComparing(s -> names.get(s.modId))
-                .thenComparing(s -> s.modId)
-                .thenComparingDouble(s -> categoryOrder.get(categoryKey(s)))
+        list.sort(Comparator.comparing((AchievementSpec s) -> !s.isVanilla())
+                .thenComparing(s -> tabs.get(s.id))
+                .thenComparingDouble(s -> categoryOrder.get(categoryKey(s, tabs)))
                 .thenComparing(s -> s.category)
-                .thenComparingDouble(s -> groupOrder.get(groupKey(s)))
+                .thenComparingDouble(s -> groupOrder.get(groupKey(s, tabs)))
                 .thenComparing(s -> s.chain.isEmpty() ? s.id : s.chain)
                 .thenComparingInt(s -> s.step)
                 .thenComparingDouble(s -> s.order)
@@ -206,12 +220,17 @@ public final class Catalog {
         sorted = Collections.unmodifiableList(list);
     }
 
-    private static String categoryKey(AchievementSpec s) {
-        return s.modId + "\n" + s.category;
+    /** Tabs are told apart by title, whatever its case. */
+    public static String tabKey(String tabName) {
+        return tabName == null ? "" : tabName.trim().toLowerCase(Locale.ROOT);
     }
 
-    private static String groupKey(AchievementSpec s) {
-        return categoryKey(s) + "\n" + (s.chain.isEmpty() ? "id:" + s.id : "chain:" + s.chain);
+    private static String categoryKey(AchievementSpec s, Map<String, String> tabs) {
+        return tabs.get(s.id) + "\n" + s.category;
+    }
+
+    private static String groupKey(AchievementSpec s, Map<String, String> tabs) {
+        return categoryKey(s, tabs) + "\n" + (s.chain.isEmpty() ? "id:" + s.id : "chain:" + s.chain);
     }
 
     public static void register(AchievementSpec spec) {
@@ -236,6 +255,24 @@ public final class Catalog {
     public static List<AchievementSpec> ofMod(String modId) {
         List<AchievementSpec> out = new ArrayList<>();
         for (AchievementSpec spec : all()) if (spec.modId.equals(modId)) out.add(spec);
+        return Collections.unmodifiableList(out);
+    }
+
+    /** Tab titles in list order. Two spellings of one title (other case) count as one tab, under the first. */
+    public static List<String> tabs() {
+        Map<String, String> out = new LinkedHashMap<>();
+        for (AchievementSpec spec : all()) out.putIfAbsent(tabKey(spec.tabName()), spec.tabName());
+        return Collections.unmodifiableList(new ArrayList<>(out.values()));
+    }
+
+    public static List<AchievementSpec> ofTab(String tabName) {
+        List<AchievementSpec> out = new ArrayList<>();
+        if (tabName == null) return out;
+        boolean vanilla = tabName.trim().equalsIgnoreCase(AchievementSpec.VANILLA_TAB);
+        String key = tabKey(tabName);
+        for (AchievementSpec spec : all()) {
+            if (vanilla ? spec.isVanilla() : tabKey(spec.tabName()).equals(key)) out.add(spec);
+        }
         return Collections.unmodifiableList(out);
     }
 

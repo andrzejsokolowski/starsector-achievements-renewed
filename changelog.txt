@@ -1,3 +1,13 @@
+Version 0.2.0 (2026-11-10)
+- The list has a column of tabs. The first tab, Achievements, holds base game achievements only. Every mod with achievements has its own tab, in alphabetical order, with its done and total count.
+- The Other mods tab is gone. MagicLib achievements and the Quality Perks milestones sit in the tab of the mod they come from.
+- For modders: new tab column (empty: a tab named after your mod, any text: that tab, vanilla: the first tab) and Builder.tab. requiredMod takes & between groups: a|b&c|d means (a or b) and (c or d).
+- For modders: new built-in check industry:<id>, with optional AI core and special item: industry:<id>:<core>:<item>.
+- When one check completes more than three achievements, three messages show and one line counts the rest. The file in saves/common is written once for all of them.
+- Fixed: a built-in check with a dot in its key, such as memory:$my.key, was taken for a class name and the row was left out.
+- The intel entry lists the counts per tab. An achievement's intel entry names its tab.
+- Licence: CC0 1.0, in a LICENSE file.
+
 Version 0.1.0 (2026-11-10)
 - First public release.
 - Achievements entry on the intel screen, with a button that opens the list.

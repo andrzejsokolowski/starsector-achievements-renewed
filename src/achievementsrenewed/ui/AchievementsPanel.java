@@ -3,8 +3,10 @@ package achievementsrenewed.ui;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -33,25 +35,30 @@ import achievementsrenewed.compat.ExternalAchievement;
 import achievementsrenewed.compat.ExternalSources;
 
 /**
- * The achievements screen: one scrolling list per tab. The Achievements tab lists this mod's own system,
- * grouped by mod, then category, then chain. The Other mods tab (only there when something is found)
- * lists what MagicLib and the milestone skills show, read-only.
+ * The achievements screen: a column of tab buttons at the left, the list of the chosen tab at the right.
+ *
+ * The first tab, "Achievements", holds base game achievements only. Every other tab is named by the
+ * achievements in it (their tab column, or the name of the mod that defined them) and the tabs come in
+ * alphabetical order, so no mod is put before another. What MagicLib and the milestone skills show goes in
+ * the tab named after the mod it comes from, read-only, together with this system's own rows of that name.
+ * A tab only exists when something is in it. Inside a tab the rows are grouped by category, then chain.
  *
  * A row that is not done is greyed out and shows its hint, or the exact condition when that LunaLib
  * setting is on. A done row shows the name, the description and the reward line.
  *
- * Each tab is one container panel built once; a tab switch moves the other container off screen (a
- * scrolling TooltipMakerAPI cannot be taken out of a panel again). The list is a scrolling
- * TooltipMakerAPI holding a content panel with the labels; row backgrounds, icons, bars and buttons are
- * drawn and hit-tested by this panel (as in Rule Book - Renewed and Gambling Den), which reads back each
- * frame where the scrolled content really is on screen. Nothing changes while the screen is open, so
+ * Every tab's list is one container panel built once; choosing a tab moves the other containers off screen
+ * (a scrolling TooltipMakerAPI cannot be taken out of a panel again). A list is a scrolling TooltipMakerAPI
+ * holding a content panel with the labels, and so is the tab column. Backgrounds, icons, bars and buttons
+ * are drawn and hit-tested by this panel (as in Rule Book - Renewed and Gambling Den), which reads back
+ * each frame where the scrolled content really is on screen. Nothing changes while the screen is open, so
  * every text is laid out once.
  */
 public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
 
-    private static final float PAD = 16f, TITLE_H = 34f, TAB_H = 28f, FOOT_H = 36f;
+    private static final float PAD = 16f, TITLE_H = 34f, HEADER_H = 30f, FOOT_H = 36f;
+    private static final float TAB_W = 250f, GUTTER = 10f, TAB_BTN_H = 30f, TAB_BTN_GAP = 4f, COUNT_W = 64f;
     private static final float SCROLLBAR_W = 22f, HIDDEN_X = -20000f;
-    private static final float MOD_H = 34f, CATEGORY_H = 26f, CHAIN_H = 22f, GAP = 4f, MOD_GAP = 12f;
+    private static final float CATEGORY_H = 26f, CHAIN_H = 22f, GAP = 4f;
     private static final float ROW_X = 10f, ROW_PAD = 8f, ICON = 48f, TEXT_GAP = 12f, LINE_GAP = 3f;
     private static final float STATUS_W = 150f, CHAIN_INDENT = 22f, BAR_W = 110f, BAR_H = 6f;
 
@@ -59,13 +66,16 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     private static final Color PANEL = new Color(20, 25, 34);
     private static final Color ROW_FILL = new Color(24, 30, 40);
     private static final Color BAR_BACK = new Color(48, 56, 68);
+    private static final Color BUTTON = new Color(32, 40, 50);
+    private static final Color BUTTON_HOVER = new Color(60, 67, 78);
+    private static final Color BUTTON_ON = new Color(98, 76, 38);
     private static final Color GOLD = new Color(235, 185, 100);
     private static final Color GREEN = new Color(120, 210, 130);
     private static final Color DIM = new Color(150, 157, 173);
     private static final Color FAINT = new Color(105, 110, 121);
     private static final Color TEXT = new Color(220, 224, 232);
 
-    private static final int MOD = 0, CATEGORY = 1, CHAIN = 2, ROW = 3;
+    private static final int CATEGORY = 1, CHAIN = 2, ROW = 3;
 
     /** One line of a list: a heading or an achievement. The texts first, then where it sits. */
     private static final class Item {
@@ -81,17 +91,28 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         }
     }
 
-    private static final class Page {
+    /** One tab: its button in the column and its list. */
+    private static final class Tab {
+        final String name;
+        final boolean vanilla;
+        final List<AchievementSpec> specs = new ArrayList<>();
+        final List<ExternalAchievement> externals = new ArrayList<>();
         final List<Item> items = new ArrayList<>();
         int done, total;
         CustomPanelAPI container, content;
-        float contentLeft, contentTop;
+        float contentLeft, contentTop, buttonY;
+        boolean hover;
+
+        Tab(String name, boolean vanilla) {
+            this.name = name;
+            this.vanilla = vanilla;
+        }
     }
 
     private static final class Btn {
         final String action;
         final float x, y, w, h;
-        boolean checked, hover;
+        boolean hover;
 
         Btn(String action, float x, float y, float w, float h) {
             this.action = action;
@@ -102,24 +123,29 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         }
     }
 
-    private final float panelW, panelH, listW;
+    private final float panelW, panelH, colTop, colH, listX, listTop, listW, listH;
     private final List<Btn> buttons = new ArrayList<>();
-    private final List<Page> pages = new ArrayList<>();
+    private final List<Tab> tabs = new ArrayList<>();
     private final Map<String, SpriteAPI> sprites = new HashMap<>();
-    private CustomPanelAPI panel, scratch;
+    private CustomPanelAPI panel, scratch, tabsContent;
     private DialogCallbacks callbacks;
     private PositionAPI position;
-    private LabelAPI summary;
-    private float listTop, listH;
+    private LabelAPI listTitle, listCount;
+    private float tabsLeft, tabsTop, tabButtonW;
     private int tab;
     private boolean dismissed, wasLeftDown;
 
     public AchievementsPanel() {
         float screenW = Global.getSettings().getScreenWidth();
         float screenH = Global.getSettings().getScreenHeight();
-        panelW = Math.max(Math.min(1000f, screenW - 80f), Math.min(760f, screenW - 10f));
+        panelW = Math.max(Math.min(1240f, screenW - 80f), Math.min(900f, screenW - 10f));
         panelH = Math.max(Math.min(940f, screenH - 80f), Math.min(600f, screenH - 10f));
-        listW = panelW - PAD * 2f;
+        colTop = PAD + TITLE_H;
+        colH = panelH - colTop - PAD - FOOT_H - 8f;
+        listX = PAD + TAB_W + GUTTER;
+        listTop = colTop + HEADER_H;
+        listW = panelW - PAD - listX;
+        listH = colH - HEADER_H;
     }
 
     public float width() {
@@ -136,67 +162,87 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         wasLeftDown = Mouse.isCreated() && Mouse.isButtonDown(0);
         scratch = panel.createCustomPanel(listW, 100f, null);
 
-        Page own = ownPage();
-        Page other = otherPage();
-        boolean tabs = !other.items.isEmpty();
-        listTop = PAD + TITLE_H + (tabs ? TAB_H + 8f : 0f);
-        listH = panelH - listTop - PAD - FOOT_H - 8f;
-
         label(panel, "ACHIEVEMENTS", GOLD, PAD, PAD + 2f, 320f, 26f, Fonts.ORBITRON_20AA, Alignment.LMID);
-        summary = label(panel, "", TEXT, panelW - PAD - 320f, PAD + 5f, 320f, 20f, Fonts.DEFAULT_SMALL, Alignment.RMID);
+        listTitle = label(panel, "", GOLD, listX + 12f, colTop + 6f, listW - COUNT_W - 36f, 18f, Fonts.ORBITRON_12, Alignment.LMID);
+        listCount = label(panel, "", TEXT, listX + listW - COUNT_W - 62f, colTop + 6f, COUNT_W + 50f, 18f,
+                Fonts.DEFAULT_SMALL, Alignment.RMID);
 
-        build(own);
-        if (tabs) {
-            build(other);
-            button("tab:0", "Achievements", PAD, PAD + TITLE_H, 150f, TAB_H);
-            button("tab:1", "Other mods", PAD + 156f, PAD + TITLE_H, 150f, TAB_H);
+        collectTabs();
+        buildTabColumn();
+        for (Tab t : tabs) {
+            fill(t);
+            build(t);
         }
 
         float footY = panelH - PAD - FOOT_H;
         if (!Settings.showHowTo()) {
             label(panel, "Exact conditions: LunaLib setting \"Show how to get achievements\".", FAINT,
-                    PAD, footY + 9f, listW - 140f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
+                    PAD, footY + 9f, panelW - PAD * 2f - 140f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
         }
-        button("close", "Close", panelW - PAD - 120f, footY, 120f, FOOT_H);
+        buttons.add(new Btn("close", panelW - PAD - 120f, footY, 120f, FOOT_H));
+        label(panel, "Close", Color.WHITE, panelW - PAD - 120f, footY + (FOOT_H - 18f) / 2f, 120f, 18f,
+                Fonts.DEFAULT_SMALL, Alignment.MID);
         showTab(0);
     }
 
-    // ---- what the lists say ----
+    // ---- which tabs there are ----
 
-    /** This mod's own system: mod, then category, then chain. */
-    private Page ownPage() {
-        Page page = new Page();
-        boolean howTo = Settings.showHowTo();
-        List<AchievementSpec> all = Achievements.all();
-        Map<String, int[]> perMod = new HashMap<>();
-        for (AchievementSpec spec : all) {
-            int[] counts = perMod.computeIfAbsent(spec.modId, id -> new int[2]);
-            if (spec.isDone()) counts[0]++;
-            counts[1]++;
+    /**
+     * The base game tab first, then every other tab by title. Other systems' achievements join the tab
+     * with the name of their mod, or make one.
+     */
+    private void collectTabs() {
+        Map<String, Tab> byKey = new HashMap<>();
+        for (AchievementSpec spec : Achievements.all()) {
+            tabFor(byKey, spec.tabName(), spec.isVanilla()).specs.add(spec);
         }
+        for (ExternalAchievement a : ExternalSources.readAll()) {
+            tabFor(byKey, a.group, false).externals.add(a);
+        }
+        tabs.sort((a, b) -> {
+            if (a.vanilla != b.vanilla) return a.vanilla ? -1 : 1;
+            int byName = a.name.compareToIgnoreCase(b.name);
+            return byName != 0 ? byName : a.name.compareTo(b.name);
+        });
+        for (Tab t : tabs) {
+            t.total = t.specs.size() + t.externals.size();
+            for (AchievementSpec spec : t.specs) if (spec.isDone()) t.done++;
+            for (ExternalAchievement a : t.externals) if (a.done) t.done++;
+        }
+    }
 
-        String mod = null, category = null, chain = null;
+    private Tab tabFor(Map<String, Tab> byKey, String name, boolean vanilla) {
+        String key = Catalog.tabKey(name);
+        Tab found = byKey.get(key);
+        if (found == null) {
+            found = new Tab(name.trim(), vanilla);
+            byKey.put(key, found);
+            tabs.add(found);
+        }
+        return found;
+    }
+
+    // ---- what a list says ----
+
+    /** This system's rows by category and chain, then what other systems show for the same mod. */
+    private void fill(Tab t) {
+        boolean howTo = Settings.showHowTo();
+        String category = null, chain = null;
         Item lastChained = null;
-        for (AchievementSpec spec : all) {
-            boolean newMod = !spec.modId.equals(mod);
-            boolean newCategory = newMod || !spec.category.equals(category);
+        for (AchievementSpec spec : t.specs) {
+            boolean newCategory = !spec.category.equals(category);
             boolean newChain = newCategory || !spec.chain.equals(chain);
             if (newChain && lastChained != null) {
                 lastChained.chainEnd = true;
                 lastChained = null;
             }
-            if (newMod) {
-                mod = spec.modId;
-                int[] counts = perMod.get(mod);
-                page.items.add(heading(MOD, Catalog.modName(mod), counts[0] + " / " + counts[1]));
-            }
             if (newCategory) {
                 category = spec.category;
-                if (!category.isEmpty()) page.items.add(heading(CATEGORY, category, ""));
+                if (!category.isEmpty()) t.items.add(heading(CATEGORY, category));
             }
             if (newChain) {
                 chain = spec.chain;
-                if (!chain.isEmpty()) page.items.add(heading(CHAIN, chain, ""));
+                if (!chain.isEmpty()) t.items.add(heading(CHAIN, chain));
             }
 
             Item row = new Item(ROW);
@@ -211,7 +257,6 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
                 row.statusColor = GREEN;
                 String date = Achievements.doneDate(spec.id);
                 row.status2 = date == null ? "" : date;
-                page.done++;
             } else {
                 boolean revealed = spec.isRevealed();
                 row.hidden = !revealed && !howTo;
@@ -228,34 +273,24 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
                     row.statusColor = TEXT;
                 }
             }
-            page.total++;
             if (!spec.chain.isEmpty()) {
                 row.chained = true;
                 row.chainStart = lastChained == null;
                 lastChained = row;
             }
-            page.items.add(row);
+            t.items.add(row);
         }
         if (lastChained != null) lastChained.chainEnd = true;
-        return page;
-    }
 
-    /** What other systems show, grouped by the mod each achievement comes from. */
-    private Page otherPage() {
-        Page page = new Page();
-        List<ExternalAchievement> all = ExternalSources.readAll();
-        Map<String, int[]> perGroup = new HashMap<>();
-        for (ExternalAchievement a : all) {
-            int[] counts = perGroup.computeIfAbsent(a.group, id -> new int[2]);
-            if (a.done) counts[0]++;
-            counts[1]++;
-        }
-        String group = null;
-        for (ExternalAchievement a : all) {
-            if (!a.group.equals(group)) {
-                group = a.group;
-                int[] counts = perGroup.get(group);
-                page.items.add(heading(MOD, group, counts[0] + " / " + counts[1]));
+        // A heading names the other system only where the tab mixes systems.
+        Set<String> sources = new LinkedHashSet<>();
+        for (ExternalAchievement a : t.externals) sources.add(a.source);
+        boolean nameSources = !t.specs.isEmpty() || sources.size() > 1;
+        String source = null;
+        for (ExternalAchievement a : t.externals) {
+            if (nameSources && !a.source.equals(source)) {
+                source = a.source;
+                if (!source.isEmpty()) t.items.add(heading(CATEGORY, source));
             }
             Item row = new Item(ROW);
             row.icon = a.icon.isEmpty() ? Ids.ICON : a.icon;
@@ -268,23 +303,19 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             if (a.done) {
                 row.status = "Done";
                 row.statusColor = GREEN;
-                page.done++;
             } else if (a.goal > 1 && !a.hidden) {
                 row.goal = a.goal;
                 row.progress = Math.max(0, Math.min(a.goal, a.progress));
                 row.status = row.progress + " / " + row.goal;
                 row.statusColor = TEXT;
             }
-            page.total++;
-            page.items.add(row);
+            t.items.add(row);
         }
-        return page;
     }
 
-    private static Item heading(int kind, String title, String status) {
+    private static Item heading(int kind, String title) {
         Item item = new Item(kind);
         item.title = title;
-        item.status = status;
         return item;
     }
 
@@ -314,14 +345,54 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         return label.getPosition().getHeight();
     }
 
+    /** A text cut to fit a width on one line, with "..." when something was cut. */
+    private static String fit(String text, String font, float width) {
+        try {
+            if (Global.getSettings().computeStringWidth(text, font) <= width) return text;
+            String cut = text;
+            while (cut.length() > 1 && Global.getSettings().computeStringWidth(cut + "...", font) > width) {
+                cut = cut.substring(0, cut.length() - 1);
+            }
+            return cut.trim() + "...";
+        } catch (Throwable t) {
+            // No width to be had: cut by length.
+            return text.length() <= 26 ? text : text.substring(0, 24).trim() + "...";
+        }
+    }
+
+    /** The column of tab buttons: one scrolling list of names and counts. */
+    private void buildTabColumn() {
+        float contentH = Math.max(colH, tabs.size() * (TAB_BTN_H + TAB_BTN_GAP) + TAB_BTN_GAP);
+        boolean scrolls = contentH > colH;
+        tabButtonW = TAB_W - (scrolls ? SCROLLBAR_W : 0f);
+
+        CustomPanelAPI container = panel.createCustomPanel(TAB_W, colH, null);
+        panel.addComponent(container).inTL(PAD, colTop);
+        tabsLeft = PAD;
+        tabsTop = colTop;
+        TooltipMakerAPI scroller = container.createUIElement(TAB_W, colH, true);
+        tabsContent = container.createCustomPanel(TAB_W, contentH, null);
+        float y = TAB_BTN_GAP;
+        for (Tab t : tabs) {
+            t.buttonY = y;
+            float textY = y + (TAB_BTN_H - 18f) / 2f;
+            label(tabsContent, fit(t.name, Fonts.DEFAULT_SMALL, tabButtonW - COUNT_W - 26f), Color.WHITE, 12f,
+                    textY, tabButtonW - COUNT_W - 20f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
+            label(tabsContent, t.done + " / " + t.total, t.done >= t.total ? GREEN : DIM, tabButtonW - COUNT_W - 10f,
+                    textY, COUNT_W, 18f, Fonts.DEFAULT_SMALL, Alignment.RMID);
+            y += TAB_BTN_H + TAB_BTN_GAP;
+        }
+        scroller.addCustom(tabsContent, 0f);
+        scroller.setHeightSoFar(contentH);
+        container.addUIElement(scroller).inTL(0f, 0f);
+    }
+
     /** Lays the items out top to bottom, then builds the container, the scroller and every label. */
-    private void build(Page page) {
-        float y = 0f;
-        for (Item item : page.items) {
-            if (item.kind == MOD) {
-                if (y > 0f) y += MOD_GAP;
-                item.h = MOD_H;
-            } else if (item.kind == CATEGORY) {
+    private void build(Tab t) {
+        float y = GAP;
+        for (Item item : t.items) {
+            if (item.kind == CATEGORY) {
+                if (y > GAP) y += 6f;
                 item.h = CATEGORY_H;
             } else if (item.kind == CHAIN) {
                 item.h = CHAIN_H;
@@ -344,28 +415,20 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         }
         float contentH = Math.max(listH, y + GAP);
 
-        page.container = panel.createCustomPanel(listW, listH, null);
-        panel.addComponent(page.container).inTL(PAD, listTop);
-        page.contentLeft = PAD;
-        page.contentTop = listTop;
+        t.container = panel.createCustomPanel(listW, listH, null);
+        panel.addComponent(t.container).inTL(HIDDEN_X, listTop);
+        t.contentLeft = listX;
+        t.contentTop = listTop;
 
-        TooltipMakerAPI scroller = page.container.createUIElement(listW, listH, true);
-        page.content = page.container.createCustomPanel(listW, contentH, null);
-        for (Item item : page.items) addLabels(page.content, item);
-        scroller.addCustom(page.content, 0f);
+        TooltipMakerAPI scroller = t.container.createUIElement(listW, listH, true);
+        t.content = t.container.createCustomPanel(listW, contentH, null);
+        for (Item item : t.items) addLabels(t.content, item);
+        scroller.addCustom(t.content, 0f);
         scroller.setHeightSoFar(contentH);
-        page.container.addUIElement(scroller).inTL(0f, 0f);
-        pages.add(page);
+        t.container.addUIElement(scroller).inTL(0f, 0f);
     }
 
     private void addLabels(CustomPanelAPI content, Item item) {
-        float statusX = contentW() - STATUS_W - TEXT_GAP;
-        if (item.kind == MOD) {
-            label(content, item.title.toUpperCase(), GOLD, 12f, item.y + 8f, contentW() - STATUS_W - 40f, 18f,
-                    Fonts.ORBITRON_12, Alignment.LMID);
-            label(content, item.status, TEXT, statusX, item.y + 8f, STATUS_W, 18f, Fonts.DEFAULT_SMALL, Alignment.RMID);
-            return;
-        }
         if (item.kind == CATEGORY) {
             label(content, item.title, TEXT, 12f, item.y + 4f, contentW() - 24f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
             return;
@@ -389,6 +452,7 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         if (!item.line3.isEmpty()) wrapped(content, item.line3, GOLD, Fonts.DEFAULT_SMALL, x, y, w);
 
         // The status sits right of the text: one line centred, or two lines (or a line and a bar).
+        float statusX = contentW() - STATUS_W - TEXT_GAP;
         boolean second = !item.status2.isEmpty() || (item.goal > 1 && !item.done);
         float mid = item.y + item.h / 2f;
         if (!item.status.isEmpty()) {
@@ -418,39 +482,17 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         label.getPosition().inTL(x, y);
     }
 
-    /** A self-drawn button on the panel itself. */
-    private void button(String action, String text, float x, float y, float w, float h) {
-        buttons.add(new Btn(action, x, y, w, h));
-        label(panel, text, Color.WHITE, x, y + (h - 18f) / 2f, w, 18f, Fonts.DEFAULT_SMALL, Alignment.MID);
-    }
-
     // ---- tabs and input ----
 
     private void showTab(int next) {
+        if (tabs.isEmpty()) return;
         tab = next;
-        for (int i = 0; i < pages.size(); i++) {
-            pages.get(i).container.getPosition().inTL(i == tab ? PAD : HIDDEN_X, listTop);
+        for (int i = 0; i < tabs.size(); i++) {
+            tabs.get(i).container.getPosition().inTL(i == tab ? listX : HIDDEN_X, listTop);
         }
-        Page page = pages.get(tab);
-        summary.setText(page.done + " / " + page.total + " done");
-        for (Btn b : buttons) {
-            if (b.action.startsWith("tab:")) b.checked = Integer.parseInt(b.action.substring(4)) == tab;
-        }
-    }
-
-    private void act(String action) {
-        if (dismissed) return;
-        if (action.equals("close")) {
-            close();
-            return;
-        }
-        if (action.startsWith("tab:")) {
-            int next = Integer.parseInt(action.substring(4));
-            if (next != tab && next < pages.size()) {
-                Global.getSoundPlayer().playUISound("ui_button_pressed", 1f, 0.6f);
-                showTab(next);
-            }
-        }
+        Tab t = tabs.get(tab);
+        listTitle.setText(fit(t.name.toUpperCase(), Fonts.ORBITRON_12, listW - COUNT_W - 80f));
+        listCount.setText(t.done + " / " + t.total + " done");
     }
 
     private void close() {
@@ -459,14 +501,20 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         if (callbacks != null) callbacks.dismissDialog();
     }
 
-    /** Reads where the shown list's scrolled content sits now, in this panel's top-down coordinates. */
+    /** Reads where the scrolled contents sit now, in this panel's top-down coordinates. */
     private void updateContent() {
-        if (position == null || pages.isEmpty()) return;
-        Page page = pages.get(tab);
-        PositionAPI p = page.content == null ? null : page.content.getPosition();
+        if (position == null) return;
+        if (tabsContent != null && tabsContent.getPosition() != null) {
+            PositionAPI p = tabsContent.getPosition();
+            tabsLeft = p.getX() - position.getX();
+            tabsTop = (position.getY() + panelH) - (p.getY() + p.getHeight());
+        }
+        if (tabs.isEmpty()) return;
+        Tab t = tabs.get(tab);
+        PositionAPI p = t.content == null ? null : t.content.getPosition();
         if (p == null) return;
-        page.contentLeft = p.getX() - position.getX();
-        page.contentTop = (position.getY() + panelH) - (p.getY() + p.getHeight());
+        t.contentLeft = p.getX() - position.getX();
+        t.contentTop = (position.getY() + panelH) - (p.getY() + p.getHeight());
     }
 
     private static boolean inBox(float mx, float my, float x, float y, float w, float h) {
@@ -484,11 +532,24 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         boolean leftDown = Mouse.isButtonDown(0);
         boolean clicked = leftDown && !wasLeftDown;
         wasLeftDown = leftDown;
+
         for (Btn b : buttons) b.hover = inBox(mx, my, b.x, b.y, b.w, b.h);
+        // A tab button reacts only where it shows: inside the column's box.
+        boolean inColumn = inBox(mx, my, PAD, colTop, tabButtonW, colH);
+        for (Tab t : tabs) {
+            t.hover = inColumn && inBox(mx, my, tabsLeft, tabsTop + t.buttonY, tabButtonW, TAB_BTN_H);
+        }
         if (!clicked) return;
-        for (Btn b : new ArrayList<>(buttons)) {
-            if (b.hover) {
-                act(b.action);
+        for (Btn b : buttons) {
+            if (b.hover && b.action.equals("close")) {
+                close();
+                return;
+            }
+        }
+        for (int i = 0; i < tabs.size(); i++) {
+            if (tabs.get(i).hover && i != tab) {
+                Global.getSoundPlayer().playUISound("ui_button_pressed", 1f, 0.6f);
+                showTab(i);
                 return;
             }
         }
@@ -527,6 +588,13 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
 
     private void frame(float left, float top, float w, float h, Color c, float thickness, float alpha) {
         GLDraw.frame(x(left), y(top + h), w, h, c, thickness, alpha);
+    }
+
+    private void clip(float left, float top, float w, float h) {
+        float scale = Global.getSettings().getScreenScaleMult();
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor((int) (x(left) * scale), (int) (y(top + h) * scale),
+                (int) Math.ceil(w * scale), (int) Math.ceil(h * scale));
     }
 
     /** The sprite for a path, loading its texture if nothing has yet; the trophy when it cannot be had. */
@@ -571,7 +639,7 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
 
     @Override
     public void renderBelow(float alpha) {
-        if (position == null || pages.isEmpty()) return;
+        if (position == null) return;
         updateContent();
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT | GL11.GL_CURRENT_BIT
                 | GL11.GL_TEXTURE_BIT | GL11.GL_LINE_BIT | GL11.GL_SCISSOR_BIT);
@@ -583,29 +651,47 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             rect(0f, 0f, panelW, panelH, BG, alpha);
             frame(0f, 0f, panelW, panelH, GOLD, 2f, alpha * 0.6f);
 
-            drawList(pages.get(tab), alpha);
-            for (Btn b : buttons) drawButton(b, alpha);
+            drawTabColumn(alpha);
+            if (!tabs.isEmpty()) drawList(tabs.get(tab), alpha);
+            for (Btn b : buttons) {
+                GLDraw.bevelledPanel(x(b.x), y(b.y + b.h), b.w, b.h, b.hover ? BUTTON_HOVER : BUTTON, 2f, alpha);
+                frame(b.x, b.y, b.w, b.h, DIM, 1f, alpha * 0.65f);
+            }
         } finally {
             GL11.glPopAttrib();
         }
     }
 
-    private void drawList(Page page, float alpha) {
-        rect(PAD, listTop, listW, listH, PANEL, alpha * 0.6f);
-        frame(PAD, listTop, listW, listH, DIM, 1f, alpha * 0.25f);
+    private void drawTabColumn(float alpha) {
+        rect(PAD, colTop, TAB_W, colH, PANEL, alpha * 0.6f);
+        frame(PAD, colTop, TAB_W, colH, DIM, 1f, alpha * 0.25f);
+        clip(PAD, colTop, TAB_W, colH);
+        for (int i = 0; i < tabs.size(); i++) {
+            Tab t = tabs.get(i);
+            float top = tabsTop + t.buttonY;
+            if (top + TAB_BTN_H < colTop || top > colTop + colH) continue;
+            boolean on = i == tab;
+            float left = tabsLeft + 4f, w = tabButtonW - 8f;
+            GLDraw.bevelledPanel(x(left), y(top + TAB_BTN_H), w, TAB_BTN_H, on ? BUTTON_ON : t.hover ? BUTTON_HOVER : BUTTON,
+                    2f, alpha);
+            frame(left, top, w, TAB_BTN_H, on ? GOLD : DIM, 1f, alpha * (on ? 0.8f : 0.4f));
+        }
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+    }
 
-        float scale = Global.getSettings().getScreenScaleMult();
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) (x(PAD) * scale), (int) (y(listTop + listH) * scale),
-                (int) Math.ceil(listW * scale), (int) Math.ceil(listH * scale));
-        float left = page.contentLeft, w = contentW();
-        for (Item item : page.items) {
-            float top = page.contentTop + item.y;
+    private void drawList(Tab t, float alpha) {
+        // The header bar with the tab's title and count, then the list box.
+        rect(listX, colTop, listW, HEADER_H - 2f, PANEL, alpha);
+        rect(listX, colTop + HEADER_H - 3f, listW, 1f, GOLD, alpha * 0.45f);
+        rect(listX, listTop, listW, listH, PANEL, alpha * 0.6f);
+        frame(listX, listTop, listW, listH, DIM, 1f, alpha * 0.25f);
+
+        clip(listX, listTop, listW, listH);
+        float left = t.contentLeft, w = contentW();
+        for (Item item : t.items) {
+            float top = t.contentTop + item.y;
             if (top + item.h + GAP < listTop || top - GAP > listTop + listH) continue;
-            if (item.kind == MOD) {
-                rect(left, top, w, MOD_H, PANEL, alpha);
-                rect(left, top + MOD_H - 1f, w, 1f, GOLD, alpha * 0.45f);
-            } else if (item.kind == CATEGORY) {
+            if (item.kind == CATEGORY) {
                 rect(left + 12f, top + CATEGORY_H - 2f, w - 24f, 1f, DIM, alpha * 0.3f);
             } else if (item.kind == ROW) {
                 drawRow(item, left, top, w, alpha);
@@ -639,11 +725,5 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             rect(barX, barY, BAR_W, BAR_H, BAR_BACK, alpha);
             rect(barX, barY, BAR_W * item.progress / (float) item.goal, BAR_H, GOLD, alpha * 0.9f);
         }
-    }
-
-    private void drawButton(Btn b, float alpha) {
-        Color fill = b.checked ? new Color(98, 76, 38) : b.hover ? new Color(60, 67, 78) : new Color(32, 40, 50);
-        GLDraw.bevelledPanel(x(b.x), y(b.y + b.h), b.w, b.h, fill, 2f, alpha);
-        frame(b.x, b.y, b.w, b.h, b.checked ? GOLD : DIM, 1f, alpha * 0.65f);
     }
 }

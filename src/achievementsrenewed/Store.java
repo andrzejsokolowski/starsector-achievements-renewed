@@ -22,6 +22,8 @@ public final class Store {
 
     /** Id to date (yyyy-MM-dd, or empty when the date is unknown). */
     private static Map<String, String> done;
+    /** While held, the file is written once at the end instead of once per achievement. */
+    private static boolean held, unwritten;
 
     private Store() {}
 
@@ -101,7 +103,20 @@ public final class Store {
             today = "";
         }
         done().put(id, today);
-        write();
+        if (held) unwritten = true;
+        else write();
         return true;
+    }
+
+    /**
+     * Holds back the writing while a check runs, so a save that earns many achievements at once writes the
+     * file one time. Letting go writes what is waiting.
+     */
+    public static void hold(boolean on) {
+        held = on;
+        if (!on && unwritten) {
+            unwritten = false;
+            write();
+        }
     }
 }

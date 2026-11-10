@@ -30,7 +30,7 @@ public final class MilestoneSkillReader implements ExternalSource {
             ModSpecAPI mod = skill.getSourceMod();
             String group = mod != null && mod.getName() != null ? mod.getName().trim() : "Milestones";
             out.add(new ExternalAchievement(group, skill.getName(), skill.getDescription(), skill.getSpriteName(),
-                    player.getSkillLevel(id) > 0f, false, 0, 0));
+                    player.getSkillLevel(id) > 0f, false, 0, 0, "Milestones"));
         }
         return out;
     }
