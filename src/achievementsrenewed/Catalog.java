@@ -23,7 +23,8 @@ import achievementsrenewed.scripts.BuiltIn;
 /**
  * Every achievement the game can offer: the rows of data/config/achievements_renewed/achievements.csv,
  * merged over all mods, plus the ones mods register from code. Rows whose required mods are off are left
- * out before their script class is loaded. A broken row is logged and skipped.
+ * out before their script class is loaded. A broken row is logged and skipped. The reward text of a row
+ * whose rewardMod is not met is left empty (the rbr_* rows name Rule Book rules).
  *
  * The list is read the first time anything asks for it, so a mod that loads before this one can already
  * register achievements in its onApplicationLoad.
@@ -98,7 +99,7 @@ public final class Catalog {
                 .category(str(row, "category"))
                 .goal(goal)
                 .secret(isTrue(str(row, "secret")))
-                .reward(str(row, "reward"))
+                .reward(modsEnabled(str(row, "rewardMod")) ? str(row, "reward") : "")
                 .chain(str(row, "chain"), stepText.isEmpty() ? 0 : Integer.parseInt(stepText))
                 .after(str(row, "after"))
                 .script(script)

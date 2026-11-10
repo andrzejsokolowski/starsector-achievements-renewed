@@ -13,7 +13,7 @@ during the work, not only at release time.
 ## What other mods rely on
 
 Rule Book - Renewed and New Game Plus - Renewed (`ngp_renewed`) use this mod's API. Everything in
-`achievementsrenewed.api`, the CSV columns (and what `tab` and `requiredMod` mean), the built-in script words, the sector memory keys
+`achievementsrenewed.api`, the CSV columns (and what `tab` and `requiredMod` and `rewardMod` mean), the built-in script words, the sector memory keys
 `$acr_doneCount` and `$acr_totalCount`, and the file name in saves/common are a contract: add to them, never
 rename or remove. New Game Plus - Renewed 0.6.0 uses `register`, `get`, `complete`, `AchievementSpec.builder`
 and the listener, so those are contract too.
@@ -31,10 +31,21 @@ mod that adds achievements. [...] I don't want my mods to take preference and ot
 that way." So: the first tab holds only rows with `tab` = `vanilla`. Every other tab is named by its rows
 (`tab` text, or the defining mod's name when empty) and the tabs are in alphabetical order. Nothing in the
 order or the layout may favour a mod, Oddisz's included. MagicLib and milestone achievements go in the tab
-with their mod's name, never in a tab of leftovers. This mod's own `acr_*` rows are all `vanilla` (the
-build checks it). Licence: CC0 1.0 for everything (Andrzej, 2026-11-10), in `LICENSE`.
+with their mod's name, never in a tab of leftovers. This mod's rows without `requiredMod` are all `vanilla`;
+a row about another mod (it names it in `requiredMod`) is in that mod's tab (the build checks both). Licence: CC0 1.0 for everything (Andrzej, 2026-11-10), in `LICENSE`.
 
 Andrzej's standing instruction: fix what you find when you find it, not in the next version.
+
+## Rule Book's achievements (0.3.0)
+
+Andrzej approved (Rule Book session, 2026-11-11, "Yes, send it") that this mod holds every achievement and
+detects it; Rule Book - Renewed and New Game Plus - Renewed only ask. The 45 `rbr_*` rows that are not
+challenges came from Rule Book 0.10.3 with ids, names, texts and conditions unchanged (only `mod`, `script`
+and three icons that were Rule Book art changed). Their checks are `scripts/Feats` (a port of Rule Book's
+`Feats`), reported by `scripts/FeatScript`. Never rename an `rbr_*` id or change its condition: New Game Plus
+pays once per id and Rule Book unlocks rules from them. The 13 `rbr_challenge_*` rows stay in Rule Book,
+which completes them with `Achievements.complete`. Rows that name a Rule Book rule in `reward` carry
+`rewardMod` = `rulebook_renewed`. Checks about other mods read only what those mods leave in the save.
 
 ## Writing
 
@@ -80,7 +91,8 @@ achievement list (columns, ids, goals, `after`, script classes and built-in scri
 - `Store` - done achievements with the real-world date, in saves/common (`achievements_renewed.json`). A
   file that cannot be read counts as empty and is kept as `achievements_renewed_unreadable.json`.
 - `SaveData` - per save, in the sector's persistent data, plain maps and lists only: `acr_counts` (counts
-  added from code), `acr_wins` (battles won: `all`, `station`, `faction:<id>`), `acr_notices` (intel log
+  added from code), `acr_wins` (battles won: `all`, `station`, `faction:<id>`, `abyss` = an Omega, Threat or
+  Dweller fleet, `giant` = at least twice the player side's fleet points), `acr_notices` (intel log
   entries as `timestamp|id`).
 - `Tracker` - the checks (`CheckScript`: first frame after a load, then daily. `BattleListener`: after
   every battle the player is in. Also when the list opens), completion (saves/common, memory keys,

@@ -1,3 +1,8 @@
+Version 0.3.0 (2026-11-11)
+- 45 more achievements, taken over from Rule Book - Renewed with the same names and conditions: 26 for the base game (story missions, colonies, a million credits, battles) and 19 for other mods, each in the tab of its mod. Achievements you already have stay done.
+- Their reward lines, such as "Unlocks the rule Ludd's Song", show only while Rule Book - Renewed is on.
+- For modders: new column rewardMod. The reward text shows only while that mod is on (same form as requiredMod).
+
 Version 0.2.2 (2026-11-10)
 - The mod now has its forum topic. Mod managers link to it.
 

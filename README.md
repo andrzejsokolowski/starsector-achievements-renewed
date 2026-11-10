@@ -19,7 +19,9 @@ Achievements for the Starsector campaign, kept across all your saves. For Starse
 - Done achievements are in `saves/common/achievements_renewed.json.data`. The mod can be added to a running
   save. It keeps none of its own classes in the save, so the save still loads without it.
 
-The mod comes with 10 achievements for the base game. Mods such as Rule Book - Renewed add their own.
+The mod comes with 36 achievements for the base game (story missions, colonies, battles and more) and 19
+for other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
+rules; their reward line shows only while Rule Book is on.
 
 Licence: CC0 1.0 (see `LICENSE`). Do what you like with it.
 
@@ -64,6 +66,7 @@ id that exists already replaces it. A row that cannot be read is logged and left
 | `requiredMod` | Mod id. `a\|b` means a or b. `a\|b&c\|d` means (a or b) and (c or d). The row is dropped when this is not met, before its script class is loaded. |
 | `order` | Sort order inside the tab, lowest first. Categories and chains sit where their first achievement sits. |
 | `mod` | The mod id the row belongs to. Leave empty: it is your own mod, found from the file's folder. |
+| `rewardMod` | Mod id, in the same form as `requiredMod`. The `reward` text shows only while it is met. Empty: always. |
 | `tab` | The tab the row is listed in. Empty: a tab with your mod's name. Any text: a tab with that title, shared with every other row that names it ("Cloning"). `vanilla`: the first tab, which is for base game achievements only. |
 
 Tabs: "Achievements" (the `vanilla` rows) comes first, the rest follow in alphabetical order. A tab exists
@@ -178,7 +181,8 @@ nothing.
 
 - Sector memory holds `$acr_doneCount` and `$acr_totalCount`, written on game load and on every
   completion. Use them in `rules.csv` or read them from Java without touching this mod's classes.
-- Rule Book - Renewed registers its feats through the CSV and unlocks rules from `isDone` and a listener.
+- Rule Book - Renewed unlocks rules from `isDone` and a listener. Its `rbr_*` achievements (not the
+  challenges) live in this mod since 0.3.0, ids unchanged; Rule Book reports its challenges with `complete`.
 - New Game Plus - Renewed (`ngp_renewed`) registers its own from code and rewards them in its own listener.
 - This mod itself gives nothing for an achievement. A mod that wants to reward one does it in its listener.
 
