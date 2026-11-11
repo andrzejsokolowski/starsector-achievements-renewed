@@ -20,7 +20,7 @@ Achievements for the Starsector campaign, kept across all your saves. For Starse
   save. It keeps none of its own classes in the save, so the save still loads without it.
 
 The mod comes with 36 achievements for the base game (story missions, colonies, battles and more) and 17
-for other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
+for Oddisz's other mods, plus 157 for the quests and named bounties of 37 other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
 rules; their reward line shows only while Rule Book is on.
 
 Licence: CC0 1.0 (see `LICENSE`). Do what you like with it.
@@ -77,9 +77,15 @@ The `script` column takes a built-in check or a class name.
 
 | Script | Count |
 | --- | --- |
-| `memory:$key` | The sector memory key is set. A number or a list counts as that many. |
+| `memory:$key` | The sector memory key is set. A number or a list counts as that many. The text "false" counts as not set. |
+| `memory:$a&$b`, `memory:$a\|$b` | 1 when all (`&`) or any (`\|`) of the keys are set. Do not mix `&` and `\|`. |
+| `memory:$key=VALUE`, `memory:$key>=10`, `memory:$a&!$b` | 1 when the key holds that text or number, at least that number, or (`!`) is not set. Works inside `&` and `\|` too. |
 | `player_memory:$key` | The same in the player character's memory. |
 | `persistent:key` | The same in the sector's persistent data. |
+| `person_memory:<person id>:$key` | The same in the memory of an important person. |
+| `faction_memory:<faction id>:$key` | The same in the memory of a faction. |
+| `entity_memory:<entity id>:$key` | The same in the memory of a station, planet or other entity. |
+| `skill:<skill id>` | 1 when the player has that skill. |
 | `level` | The player's level. |
 | `colonies`, `colonies:6` | The player's colonies, or only those of size 6 and up. |
 | `credits` | The player's credits. |

@@ -53,6 +53,17 @@ which completes them with `Achievements.complete`. Rows that name a Rule Book ru
 more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everything Shop
 (`the_everything_shop`), with the old Extra Submarkets id and its Gilgamesh Nebula still counting.
 
+## Quest achievements (0.4.0)
+
+Andrzej, 2026-11-11: make achievements for other mods' quests from his quest list artifact, each only while
+that mod is on. 127 `acr_q_*` rows plus 30 `ngp_*` rows. The `ngp_*` rows are New Game Plus - Renewed's feats
+about other mods with its ids, names, texts and conditions: New Game Plus registers the same ids from code
+(that replaces the row while it is on) and pays once per id, so never rename them. Every row reads only what
+the quest's mod leaves in the save (memory keys, persistent data, a person's, faction's or entity's memory, a
+skill), found in that mod's files (2026-11-11 research, not checked in game). `tab` is the mod's own name from
+its mod_info.json, so the rows join that mod's MagicLib achievements. A quest whose mod already has its own
+MagicLib achievement for it is left out unless New Game Plus has it.
+
 ## Writing
 
 Player-facing text is short and plain, in the game's own tone. No flavour lines, no explaining paragraphs.

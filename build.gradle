@@ -173,7 +173,7 @@ tasks.register('checkReleaseFiles') {
             }
             out << cur.toString(); out
         }
-        def builtIns = ['memory', 'player_memory', 'persistent', 'level', 'colonies', 'credits', 'wins', 'industry']
+        def builtIns = ['memory', 'player_memory', 'persistent', 'level', 'colonies', 'credits', 'wins', 'industry', 'skill', 'person_memory', 'faction_memory', 'entity_memory']
         def featChecks = file('src/achievementsrenewed/scripts/Feats.java').getText('UTF-8')
         def rows = [:]
         lines.drop(1).findAll { it.trim() && !it.startsWith('#') }.each { line ->

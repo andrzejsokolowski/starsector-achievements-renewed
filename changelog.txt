@@ -1,3 +1,8 @@
+Version 0.4.0 (2026-11-11)
+- 157 achievements for the quests, story missions and named bounties of 37 other mods, such as Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab and Emergent Threats. Each sits in the tab of its mod and shows only while that mod is on.
+- The New Game Plus - Renewed feats about other mods are among them, with the same names, so they also show without New Game Plus and count once.
+- For modders: the memory, player_memory and persistent checks take several keys ($a&$b, $a|$b), a value ($key=VALUE, $key>=10) and !$key for not set. New checks person_memory:id:$key, faction_memory:id:$key, entity_memory:id:$key and skill:id.
+
 Version 0.3.2 (2026-11-11)
 - Finish At The Gates, Grow a colony to size 6 and Defeat an Omega, Threat or Dweller fleet show the icon of the Rule Book rule they unlock.
 

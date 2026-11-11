@@ -9,6 +9,10 @@ import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.SectorEntityToken;
+import com.fs.starfarer.api.characters.MutableCharacterStatsAPI;
+import com.fs.starfarer.api.characters.PersonAPI;
 import com.fs.starfarer.api.util.Misc;
 
 import achievementsrenewed.Ids;
@@ -21,6 +25,14 @@ import achievementsrenewed.api.AchievementScript;
  *   memory:$key          the sector memory key is set (a number or a list counts as that many)
  *   player_memory:$key   the same in the player character's memory
  *   persistent:key       the same in the sector's persistent data
+ *                        These three also take several keys, counting 1 when the test is met: $a&$b (all
+ *                        set), $a|$b (any set), $key=VALUE (the key holds that text or number). A term of
+ *                        & or | may itself be key=VALUE or key>=NUMBER, and !key means the key is not set. & and | are
+ *                        not mixed in one text.
+ *   person_memory:id:$key   the same in the memory of an important person (by person id)
+ *   faction_memory:id:$key  the same in the memory of a faction (by faction id)
+ *   entity_memory:id:$key   the same in the memory of a station, planet or other entity (by entity id)
+ *   skill:id             the player has that skill (1 or 0)
  *   level                the player's level
  *   colonies             the player's colonies; colonies:6 counts only those of size 6 or more
  *   credits              the player's credits
@@ -38,7 +50,8 @@ public final class BuiltIn {
     private BuiltIn() {}
 
     /** The script for this column text, or null when the text names a class. Throws on an unknown word. */
-    // Words: memory, player_memory, persistent, level, colonies, credits, wins, industry.
+    // Words: memory, player_memory, persistent, person_memory, faction_memory, entity_memory, level, colonies,
+    // credits, wins, industry, skill.
     public static AchievementScript parse(String text) {
         int split = text.indexOf(':');
         String word = (split < 0 ? text : text.substring(0, split)).trim();
@@ -48,15 +61,48 @@ public final class BuiltIn {
         switch (word) {
             case "memory":
                 needsArgument(word, arg);
-                return spec -> value(Global.getSector().getMemoryWithoutUpdate(), arg);
+                return keys(arg, key -> {
+                    MemoryAPI memory = Global.getSector().getMemoryWithoutUpdate();
+                    return memory != null && memory.contains(key) ? memory.get(key) : null;
+                });
             case "player_memory":
                 needsArgument(word, arg);
-                return spec -> value(Global.getSector().getCharacterData().getMemoryWithoutUpdate(), arg);
+                return keys(arg, key -> {
+                    MemoryAPI memory = Global.getSector().getCharacterData().getMemoryWithoutUpdate();
+                    return memory != null && memory.contains(key) ? memory.get(key) : null;
+                });
             case "persistent":
                 needsArgument(word, arg);
+                return keys(arg, key -> Global.getSector().getPersistentData().get(key));
+            case "person_memory": {
+                String[] parts = ownerAndKeys(word, arg);
+                return keys(parts[1], key -> {
+                    PersonAPI person = Global.getSector().getImportantPeople().getPerson(parts[0]);
+                    MemoryAPI memory = person == null ? null : person.getMemoryWithoutUpdate();
+                    return memory != null && memory.contains(key) ? memory.get(key) : null;
+                });
+            }
+            case "faction_memory": {
+                String[] parts = ownerAndKeys(word, arg);
+                return keys(parts[1], key -> {
+                    FactionAPI faction = Global.getSector().getFaction(parts[0]);
+                    MemoryAPI memory = faction == null ? null : faction.getMemoryWithoutUpdate();
+                    return memory != null && memory.contains(key) ? memory.get(key) : null;
+                });
+            }
+            case "entity_memory": {
+                String[] parts = ownerAndKeys(word, arg);
+                return keys(parts[1], key -> {
+                    SectorEntityToken entity = Global.getSector().getEntityById(parts[0]);
+                    MemoryAPI memory = entity == null ? null : entity.getMemoryWithoutUpdate();
+                    return memory != null && memory.contains(key) ? memory.get(key) : null;
+                });
+            }
+            case "skill":
+                needsArgument(word, arg);
                 return spec -> {
-                    Map<String, Object> data = Global.getSector().getPersistentData();
-                    return data.containsKey(arg) ? count(data.get(arg)) : 0;
+                    MutableCharacterStatsAPI stats = Global.getSector().getPlayerStats();
+                    return stats != null && stats.getSkillLevel(arg) > 0f ? 1 : 0;
                 };
             case "level":
                 return spec -> Global.getSector().getPlayerStats().getLevel();
@@ -120,14 +166,79 @@ public final class BuiltIn {
         if (arg.isEmpty()) throw new IllegalArgumentException(word + " needs a key, as " + word + ":key");
     }
 
-    private static int value(MemoryAPI memory, String key) {
-        if (memory == null || !memory.contains(key)) return 0;
-        return count(memory.get(key));
+    private interface Lookup {
+        Object get(String key);
     }
 
-    /** A flag counts as 1, false and null as 0, a number as itself, a list as its size. */
+    /**
+     * One key: its count. Several keys joined by & or |, or key=VALUE terms: 1 when the test is met, else 0.
+     */
+    private static AchievementScript keys(String arg, Lookup lookup) {
+        boolean all = arg.contains("&");
+        boolean any = arg.contains("|");
+        if (all && any) throw new IllegalArgumentException("do not mix & and | in " + arg);
+        if (!all && !any && !arg.contains("=") && !arg.startsWith("!")) return spec -> count(lookup.get(arg));
+        String[] terms = arg.split(all ? "&" : "[|]");
+        for (String term : terms) {
+            if (term.trim().isEmpty()) throw new IllegalArgumentException("empty key in " + arg);
+        }
+        return spec -> {
+            for (String term : terms) {
+                boolean met = term(term.trim(), lookup);
+                if (all && !met) return 0;
+                if (!all && met) return 1;
+            }
+            return all ? 1 : 0;
+        };
+    }
+
+    /** "id:keys" split at the first colon; both parts needed. */
+    private static String[] ownerAndKeys(String word, String arg) {
+        int split = arg.indexOf(':');
+        if (split <= 0 || split == arg.length() - 1)
+            throw new IllegalArgumentException(word + " needs an id and a key, as " + word + ":id:$key");
+        return new String[] {arg.substring(0, split).trim(), arg.substring(split + 1).trim()};
+    }
+
+    /**
+     * key: set (counts 1 or more). key=VALUE: holds that text, or that number. key>=NUMBER: holds a number at
+     * least that big. !key: not set.
+     */
+    private static boolean term(String term, Lookup lookup) {
+        if (term.startsWith("!")) return !term(term.substring(1).trim(), lookup);
+        int atLeast = term.indexOf(">=");
+        if (atLeast > 0) {
+            Object value = lookup.get(term.substring(0, atLeast).trim());
+            try {
+                double wanted = Double.parseDouble(term.substring(atLeast + 2).trim());
+                if (value instanceof Number) return ((Number) value).doubleValue() >= wanted;
+                return value != null && Double.parseDouble(String.valueOf(value).trim()) >= wanted;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        int eq = term.indexOf('=');
+        if (eq < 0) return count(lookup.get(term)) > 0;
+        Object value = lookup.get(term.substring(0, eq).trim());
+        String wanted = term.substring(eq + 1).trim();
+        if (value == null) return false;
+        if (value instanceof Number) {
+            try {
+                return ((Number) value).doubleValue() == Double.parseDouble(wanted);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return String.valueOf(value).trim().equalsIgnoreCase(wanted);
+    }
+
+    /**
+     * A flag counts as 1, false, null and the text "false" as 0, a number as itself, a list as its size.
+     * (rules.csv stores some flags as the text "true" or "false".)
+     */
     private static int count(Object value) {
         if (value == null || Boolean.FALSE.equals(value)) return 0;
+        if (value instanceof String && (((String) value).trim().isEmpty() || ((String) value).trim().equalsIgnoreCase("false"))) return 0;
         if (value instanceof Number) return Math.max(0, ((Number) value).intValue());
         if (value instanceof Collection) return ((Collection<?>) value).size();
         if (value instanceof Map) return ((Map<?, ?>) value).size();

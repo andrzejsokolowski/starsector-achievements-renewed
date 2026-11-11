@@ -40,8 +40,9 @@ Needs LunaLib.
 
 [hr][center][size=12pt][b]Achievements for other mods[/b][/size][/center][hr]
 [list]
-[li]Some mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
-[li]For example: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, StarterPack, Missions - Renewed, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
+[li]Many mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
+[li]Quests, story missions and named bounties of 37 mods, for example Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab, Emergent Threats, Halo Dynamics, Lost.Sector, Knights of Ludd and United Aurora Federation.[/li]
+[li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, StarterPack, Missions - Renewed, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
 [/list]
 
 [hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
@@ -56,7 +57,7 @@ Needs LunaLib.
 [list]
 [li]Add achievements with data/config/achievements_renewed/achievements.csv in your mod: name, hint, how-to line, icon, category, goal, secret, reward text, chain and step.[/li]
 [li]Your achievements get a tab with your mod's name. The tab column puts a row in any other tab instead.[/li]
-[li]Check them without Java: a memory flag, the player's level, colonies, credits, battles won against a faction, or an industry on a colony with a given AI core and item. Or name a Java class.[/li]
+[li]Check them without Java: memory flags (several at once, a value, or not set), a person's, faction's or station's memory, a skill, the player's level, colonies, credits, battles won against a faction, or an industry on a colony with a given AI core and item. Or name a Java class.[/li]
 [li]Java API: isDone, progress, complete, addProgress, a listener for new achievements, and a call that opens the list.[/li]
 [li]Sector memory holds $acr_doneCount and $acr_totalCount for rules.csv.[/li]
 [li]The README on GitHub has the columns and examples.[/li]
@@ -77,6 +78,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.4.0[/b]
+[list][li]157 achievements for the quests, story missions and named bounties of 37 other mods, such as Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab and Emergent Threats. Each sits in the tab of its mod and shows only while that mod is on.[/li][li]The New Game Plus - Renewed feats about other mods are among them, with the same names, so they also show without New Game Plus and count once.[/li][li]For modders: the memory, player_memory and persistent checks take several keys ($a&$b, $a|$b), a value ($key=VALUE, $key>=10) and !$key for not set. New checks person_memory:id:$key, faction_memory:id:$key, entity_memory:id:$key and skill:id.[/li][/list]
 [b]0.3.2[/b]
 [list][li]Finish At The Gates, Grow a colony to size 6 and Defeat an Omega, Threat or Dweller fleet show the icon of the Rule Book rule they unlock.[/li][/list]
 [b]0.3.1[/b]
