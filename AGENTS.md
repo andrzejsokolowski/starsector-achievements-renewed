@@ -43,8 +43,8 @@ Andrzej's standing instruction: fix what you find when you find it, not in the n
 
 Andrzej approved (Rule Book session, 2026-11-11, "Yes, send it") that this mod holds every achievement and
 detects it; Rule Book - Renewed and New Game Plus - Renewed only ask. The 45 `rbr_*` rows that are not
-challenges came from Rule Book 0.10.3 with ids, names, texts and conditions unchanged (only `mod`, `script`
-and three icons that were Rule Book art changed). Their checks are `scripts/Feats` (a port of Rule Book's
+challenges came from Rule Book 0.10.3 with ids, names, texts and conditions unchanged (only `mod` and `script`
+changed; since 0.3.2 the three rule icons are copies of Rule Book's own CC0 art in `graphics/achievements_renewed/rules`). Their checks are `scripts/Feats` (a port of Rule Book's
 `Feats`), reported by `scripts/FeatScript`. Never rename an `rbr_*` id or change its condition: New Game Plus
 pays once per id and Rule Book unlocks rules from them. The 13 `rbr_challenge_*` rows stay in Rule Book,
 which completes them with `Achievements.complete`. Rows that name a Rule Book rule in `reward` carry

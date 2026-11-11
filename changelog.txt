@@ -1,3 +1,6 @@
+Version 0.3.2 (2026-11-11)
+- Finish At The Gates, Grow a colony to size 6 and Defeat an Omega, Threat or Dweller fleet show the icon of the Rule Book rule they unlock.
+
 Version 0.3.1 (2026-11-11)
 - Visit the Great Mall is now Visit the Gate of Babylon, for The Everything Shop (the older Extra Submarkets still counts). It sits in The Everything Shop's tab.
 - The two Chicken's Tech Shop achievements are gone.
