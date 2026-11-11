@@ -53,6 +53,28 @@ which completes them with `Achievements.complete`. Rows that name a Rule Book ru
 more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everything Shop
 (`the_everything_shop`), with the old Extra Submarkets id and its Gilgamesh Nebula still counting.
 
+## Andrzej's list changes (0.5.0, 2026-11-12)
+
+- The list opens from the ability `acr_achievements` (data/campaign/abilities.csv, `campaign/AchievementsAbility`)
+  and the LunaLib hotkey `acr_hotkey` (`campaign/HotkeyListener`, default K). The intel screen has no
+  Achievements entry any more. `campaign/AbilityKeeper` keeps the ability out of the save like IntelKeeper
+  does with intel: before a save it takes the ability off the bar and the player and keeps its slots as
+  text (`acr_abilitySlots`), after the save and on load it gives it back. It is put on the bar once per save
+  (`acr_abilityPlaced`); a player who removes it from the bar keeps it off.
+- Rows show name + hint until done. Secret ones read "Secret Achievement" (never ???). MagicLib rows have no
+  source heading. Chains have a block with space around it.
+- A chain is only for steps that must come in order (a count, or a quest that needs the one before). Steps
+  that can be done in any order are plain rows.
+- `rbr_abyss` is a Shrouded Dweller fleet only (Andrzej: "split the achievement of winning against a threat
+  fleet, shrouded dweller fleet and omega fleet"). It keeps the Rule Book unlock. `acr_win_omega` and
+  `acr_win_threat` are new. This is the one time an `rbr_*` condition changed, on his word.
+- `acr_systems25` is gone; `acr_systems_25/50/100` (`scripts/SystemsExplored`, percent of non-hidden systems).
+- `api/RewardText` + `Achievements.addRewardText`: other mods add a line under achievements (New Game Plus:
+  career points). Contract from 0.5.0. Identical lines show once.
+- Names and hints: Andrzej reviews every one in the artifact https://claude.ai/artifact/7xQg5jKtmXkJzSwGAXe7tr
+  (database collection `reviews`, one document per id: name/hint approved or rejected, nameNew, hintNew,
+  note). Apply his answers to `achievements.csv`; `ngp_*` rows also need New Game Plus's ngp_feats.csv.
+
 ## Quest achievements (0.4.0)
 
 Andrzej, 2026-11-11: make achievements for other mods' quests from his quest list artifact, each only while
@@ -117,8 +139,10 @@ achievement list (columns, ids, goals, `after`, script classes and built-in scri
   messages and one line for the rest, and writes the saves/common file once.
 - `IntelKeeper` - the mod's intel entries are never saved. They are removed before a save and put back
   after it (`beforeGameSave`, `afterGameSave`, `onGameSaveFailed`) and rebuilt on load, so a save holds no
-  class of this mod. `AchievementsIntel` is the permanent entry. `AchievementNoticeIntel` is the
-  "Achievement: name" entry, dropped after 30 days.
+  class of this mod. `AchievementNoticeIntel` is the "Achievement: name" entry, dropped after 30 days; its
+  button opens the list at that achievement (`Achievements.openList(ui, id)`).
+- `campaign` - the ability bar button, the hotkey and `AbilityKeeper` (see the 0.5.0 section).
+- `RewardLines` - the `reward` text plus the lines of `RewardText` sources, for the list and the intel entry.
 - `compat` - achievements other systems keep, shown read-only in the tab named after their mod.
   `ExternalSources` makes `compat.magiclib.MagicLibReader` by name only when
   the mod `MagicLib` is enabled (`checkMagicLibIsolated` fails the build if any other class names MagicLib).

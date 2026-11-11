@@ -2,24 +2,28 @@
 
 Achievements for the Starsector campaign, kept across all your saves. For Starsector 0.98a. Needs LunaLib.
 
-- **The list**: open it from the **Achievements** entry on the intel screen.
+- **The list**: open it with the **Achievements** button on the ability bar, or with the hotkey (K by
+  default, LunaLib setting "Hotkey for the list").
 - **Tabs**: the first tab, Achievements, holds the base game's achievements. Every mod with achievements
   has a tab of its own, in alphabetical order. Each tab shows how many you have.
-- **Hints**: an achievement you do not have is greyed out and shows a hint. Once you get it, it shows
-  what it was, and what it gave you if it unlocked something.
+- **Hints**: an achievement you do not have is greyed out and shows its name and a hint. Secret ones read
+  "Secret Achievement" until done. Once you get it, it shows what it was. Under it: what it unlocks or pays
+  in other mods (Rule Book rules, New Game Plus career points).
 - **How to get them**: the LunaLib setting "Show how to get achievements" shows the exact condition of
   every achievement instead of its hint, secret ones included.
 - **Progress**: counted achievements show how far you are in the current save, for example "3 / 10".
 - **Chains**: some achievements come in steps. A later step shows up when the one before it is done.
 - **When you get one**: a message on the campaign screen and an entry in the intel log. The LunaLib setting
-  "Show a message on completion" turns the message off. Log entries go away after 30 days. When a save
+  "Show a message on completion" turns the message off. The log entry has a button that opens the list at
+  that achievement. Log entries go away after 30 days. When a save
   earns many at once, three messages show and one line counts the rest.
 - **MagicLib and Quality Perks**: the achievements of MagicLib mods (Nexerelin and others) and the
-  milestones of Quality Perks and Quality Captains are listed too, read-only, each in the tab of its mod.
+  milestones of Quality Perks and Quality Captains are listed too, read-only, among the others of the tab
+  of their mod.
 - Done achievements are in `saves/common/achievements_renewed.json.data`. The mod can be added to a running
   save. It keeps none of its own classes in the save, so the save still loads without it.
 
-The mod comes with 36 achievements for the base game (story missions, colonies, battles and more) and 17
+The mod comes with 40 achievements for the base game (story missions, colonies, battles and more) and 17
 for Oddisz's other mods, plus 157 for the quests and named bounties of 37 other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
 rules; their reward line shows only while Rule Book is on.
 
@@ -57,11 +61,11 @@ id that exists already replaces it. A row that cannot be read is logged and left
 | `icon` | Sprite path. Empty: a trophy. Loaded for you. |
 | `category` | Heading inside the tab. May be empty. |
 | `goal` | Count needed. Empty means 1. Above 1 the list shows progress. |
-| `secret` | `true`: shown as ??? until done. |
+| `secret` | `true`: shown as "Secret Achievement" until done. |
 | `reward` | What it gives, as text: "Unlocks the rule Imperial Charter". Shown once done. May be empty. |
 | `chain` | Achievements with the same chain are listed together under this name. |
 | `step` | Order inside the chain. |
-| `after` | Id of the achievement that must be done before this one is shown. Until then it reads ???. |
+| `after` | Id of the achievement that must be done before this one is shown. Until then it reads "Next step". |
 | `script` | How it is checked. Empty: your code calls `complete` or `addProgress`. See below. |
 | `requiredMod` | Mod id. `a\|b` means a or b. `a\|b&c\|d` means (a or b) and (c or d). The row is dropped when this is not met, before its script class is loaded. |
 | `order` | Sort order inside the tab, lowest first. Categories and chains sit where their first achievement sits. |
@@ -148,8 +152,12 @@ Achievements.addListener(spec -> {
 });
 
 // Opening the list.
-Achievements.openList();        // from the campaign
-Achievements.openList(ui);      // from an intel entry's buttonPressConfirmed
+Achievements.openList();                // from the campaign
+Achievements.openList(ui);              // from an intel entry's buttonPressConfirmed
+Achievements.openList(ui, "mymod_x");   // the same, on that achievement's tab, scrolled to it
+
+// A line under achievements: what your mod gives for them. Call it in onApplicationLoad; one per class.
+Achievements.addRewardText(spec -> spec.id.startsWith("mymod_") ? "+1 medal" : null);
 ```
 
 `Achievements` in full:
@@ -168,7 +176,9 @@ Achievements.openList(ui);      // from an intel entry's buttonPressConfirmed
 | `List<AchievementSpec> chain(String chain)` | Those of one chain, in step order. |
 | `void addListener(AchievementListener)`, `removeListener` | Told when an achievement is done for the first time. |
 | `boolean showHowTo()` | The LunaLib setting. |
-| `void openList()`, `openList(IntelUIAPI)` | Opens the screen. |
+| `void openList()`, `openList(IntelUIAPI)`, `openList(IntelUIAPI, String id)` | Opens the screen, at one achievement with the id. |
+| `void addRewardText(RewardText)`, `removeRewardText` | A line under achievements in the list and their intel entries. Return null for none. Identical lines show once. |
+| `List<String> rewardLines(String id)` | The `reward` text, then the lines other mods add. |
 | `void register(AchievementSpec)` | Adds an achievement built in code with `AchievementSpec.builder(id, modId, name)`. Call it in `onApplicationLoad`. The builder has a method per column, `tab(String)` among them. Without it the tab is your mod's name. |
 | `String doneDate(String id)` | The real-world date it was done, `yyyy-MM-dd`, or null. |
 | `int doneCount()`, `int totalCount()` | Done and all, over `all()`. |
@@ -190,7 +200,8 @@ nothing.
 - Rule Book - Renewed unlocks rules from `isDone` and a listener. Its `rbr_*` achievements (not the
   challenges) live in this mod since 0.3.0, ids unchanged; Rule Book reports its challenges with `complete`.
 - New Game Plus - Renewed (`ngp_renewed`) registers its own from code and rewards them in its own listener.
-- This mod itself gives nothing for an achievement. A mod that wants to reward one does it in its listener.
+- This mod itself gives nothing for an achievement. A mod that wants to reward one does it in its listener,
+  and can say so under the achievement with `addRewardText`.
 
 ## Building
 

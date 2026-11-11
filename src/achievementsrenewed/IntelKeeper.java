@@ -14,8 +14,8 @@ import achievementsrenewed.api.AchievementSpec;
 
 /**
  * Keeps this mod's intel entries out of the save file. They are taken out of the intel screen before a
- * save and put back after it, and rebuilt on game load: the permanent Achievements entry from nothing,
- * the "Achievement: name" entries from a list of plain text kept in the save. A save made with this mod
+ * save and put back after it, and rebuilt on game load: the "Achievement: name" entries from a list of
+ * plain text kept in the save. (The list itself opens from the ability bar or the hotkey, not the intel screen.) A save made with this mod
  * holds no class of it and still loads without it.
  */
 public final class IntelKeeper {
@@ -30,21 +30,20 @@ public final class IntelKeeper {
     private IntelKeeper() {}
 
     private static boolean ours(IntelInfoPlugin intel) {
-        return intel instanceof AchievementsIntel || intel instanceof AchievementNoticeIntel;
+        return intel instanceof AchievementNoticeIntel;
     }
 
     private static String entry(long doneAt, String id) {
         return doneAt + "|" + id;
     }
 
-    /** On game load: the permanent entry, and the entries of achievements done lately in this save. */
+    /** On game load: the entries of achievements done lately in this save. */
     public static void restoreOnLoad() {
         STASHED.clear();
         IntelManagerAPI manager = Global.getSector().getIntelManager();
         for (IntelInfoPlugin intel : new ArrayList<>(manager.getIntel())) {
             if (ours(intel)) manager.removeIntel(intel);
         }
-        addQuietly(manager, new AchievementsIntel(), null, false);
 
         Iterator<String> entries = SaveData.notices().iterator();
         while (entries.hasNext()) {
@@ -83,16 +82,11 @@ public final class IntelKeeper {
     public static void unstash() {
         try {
             IntelManagerAPI manager = Global.getSector().getIntelManager();
-            boolean permanent = false;
             for (IntelInfoPlugin intel : STASHED) {
                 if (intel.isEnded()) continue;
-                if (intel instanceof AchievementsIntel) permanent = true;
                 addQuietly(manager, intel, intel.getPlayerVisibleTimestamp(), intel.isNew());
             }
             STASHED.clear();
-            if (!permanent && !manager.hasIntelOfClass(AchievementsIntel.class)) {
-                addQuietly(manager, new AchievementsIntel(), null, false);
-            }
         } catch (Throwable t) {
             LOG.error("Achievements: could not put the intel entries back after the save", t);
         }

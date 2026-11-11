@@ -15,6 +15,16 @@ public final class Settings {
         return flag("acr_showMessage", true);
     }
 
+    /** Key code of the hotkey that opens the list; 0 or less when there is none. */
+    public static int hotkey() {
+        try {
+            Integer value = LunaSettings.getInt(Ids.MOD_ID, "acr_hotkey");
+            return value == null ? 37 : value;
+        } catch (Throwable t) {
+            return 37;
+        }
+    }
+
     private static boolean flag(String key, boolean fallback) {
         try {
             Boolean value = LunaSettings.getBoolean(Ids.MOD_ID, key);

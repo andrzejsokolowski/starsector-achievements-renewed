@@ -14,6 +14,7 @@ import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
 import com.fs.starfarer.api.characters.OfficerDataAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
+import com.fs.starfarer.api.impl.campaign.ids.Factions;
 import com.fs.starfarer.api.util.Misc;
 
 import achievementsrenewed.BattleListener;
@@ -71,7 +72,8 @@ public final class Feats {
         // Battles, on the counts the wins scripts use too.
         COUNTS.put("rbr_wins", () -> wins(BuiltIn.WINS_ALL));
         COUNTS.put("rbr_remnant", () -> wins(BuiltIn.WINS_FACTION + "remnant"));
-        COUNTS.put("rbr_abyss", () -> wins(BattleListener.WINS_ABYSS));
+        // Since 0.5.0 a Shrouded Dweller fleet only (Andrzej split it from Omega and Threat, which have rows of their own).
+        COUNTS.put("rbr_abyss", () -> wins(BuiltIn.WINS_FACTION + Factions.DWELLER));
         COUNTS.put("rbr_station", () -> wins(BuiltIn.WINS_STATION));
         COUNTS.put("rbr_giant", () -> wins(BattleListener.WINS_GIANT));
 

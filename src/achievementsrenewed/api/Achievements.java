@@ -9,6 +9,7 @@ import com.fs.starfarer.api.campaign.SectorAPI;
 import com.fs.starfarer.api.ui.IntelUIAPI;
 
 import achievementsrenewed.Catalog;
+import achievementsrenewed.RewardLines;
 import achievementsrenewed.Settings;
 import achievementsrenewed.Store;
 import achievementsrenewed.Tracker;
@@ -91,9 +92,34 @@ public final class Achievements {
 
     /** Opens the achievements screen from an intel entry's button. */
     public static void openList(IntelUIAPI ui) {
+        openList(ui, null);
+    }
+
+    /**
+     * Opens the achievements screen from an intel entry's button, on the tab of this achievement, scrolled
+     * to it and marked. A null or unknown id opens the first tab.
+     */
+    public static void openList(IntelUIAPI ui, String focusId) {
         SectorAPI sector = Global.getSector();
         if (ui == null || sector == null || sector.getPlayerFleet() == null) return;
-        ui.showDialog(sector.getPlayerFleet(), new AchievementsDialog());
+        ui.showDialog(sector.getPlayerFleet(), new AchievementsDialog(focusId));
+    }
+
+    /**
+     * Adds a line under achievements in the list and their intel entries, such as what your mod pays for
+     * them. Call it in onApplicationLoad; one per class.
+     */
+    public static void addRewardText(RewardText source) {
+        RewardLines.add(source);
+    }
+
+    public static void removeRewardText(RewardText source) {
+        RewardLines.remove(source);
+    }
+
+    /** The achievement's own reward line, then the lines other mods add for it. */
+    public static List<String> rewardLines(String id) {
+        return RewardLines.of(get(id));
     }
 
     /**

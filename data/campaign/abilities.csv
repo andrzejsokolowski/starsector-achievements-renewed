@@ -1,0 +1,2 @@
+name,id,type,tags,activationDays,activationCooldown,durationDays,deactivationDays,deactivationCooldown,unlockedAtStart,defaultForAIFleet,musicSuppression,uiOn,uiOff,uiLoop,worldOn,worldOff,worldLoop,icon,plugin,ai,desc,sortOrder
+Achievements,acr_achievements,DURATION,,0,,0,0,,,,,ui_button_pressed,,,,,,graphics/achievements_renewed/icon.png,achievementsrenewed.campaign.AchievementsAbility,,Opens the list of achievements.,5000

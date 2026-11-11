@@ -3,10 +3,8 @@ package achievementsrenewed.ui;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -28,6 +26,7 @@ import com.fs.starfarer.api.ui.UIComponentAPI;
 import achievementsrenewed.AchievementNoticeIntel;
 import achievementsrenewed.Catalog;
 import achievementsrenewed.Ids;
+import achievementsrenewed.RewardLines;
 import achievementsrenewed.Settings;
 import achievementsrenewed.api.AchievementSpec;
 import achievementsrenewed.api.Achievements;
@@ -40,11 +39,13 @@ import achievementsrenewed.compat.ExternalSources;
  * The first tab, "Achievements", holds base game achievements only. Every other tab is named by the
  * achievements in it (their tab column, or the name of the mod that defined them) and the tabs come in
  * alphabetical order, so no mod is put before another. What MagicLib and the milestone skills show goes in
- * the tab named after the mod it comes from, read-only, together with this system's own rows of that name.
- * A tab only exists when something is in it. Inside a tab the rows are grouped by category, then chain.
+ * the tab named after the mod it comes from, read-only, after this system's own rows of that name and
+ * looking the same (no heading for the other system). A tab only exists when something is in it. Inside a
+ * tab the rows are grouped by category, then chain; a chain sits in a block with space around it.
  *
- * A row that is not done is greyed out and shows its hint, or the exact condition when that LunaLib
- * setting is on. A done row shows the name, the description and the reward line.
+ * A row that is not done is greyed out and shows its name and hint (the exact condition when that LunaLib
+ * setting is on), or "Secret Achievement". A done row shows the name and the description. Both show the
+ * reward lines (RewardLines). Opened from an intel entry, the list starts on that achievement.
  *
  * Every tab's list is one container panel built once; choosing a tab moves the other containers off screen
  * (a scrolling TooltipMakerAPI cannot be taken out of a panel again). A list is a scrolling TooltipMakerAPI
@@ -61,6 +62,9 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     private static final float CATEGORY_H = 26f, CHAIN_H = 22f, GAP = 4f;
     private static final float ROW_X = 10f, ROW_PAD = 8f, ICON = 48f, TEXT_GAP = 12f, LINE_GAP = 3f;
     private static final float STATUS_W = 150f, CHAIN_INDENT = 22f, BAR_W = 110f, BAR_H = 6f;
+    /** Space around a chain's block, and inside it below its last step. */
+    private static final float CHAIN_GAP = 16f, CHAIN_PAD = 10f;
+    private static final String SECRET_TITLE = "Secret Achievement";
 
     private static final Color BG = new Color(10, 13, 19);
     private static final Color PANEL = new Color(20, 25, 34);
@@ -74,6 +78,7 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     private static final Color DIM = new Color(150, 157, 173);
     private static final Color FAINT = new Color(105, 110, 121);
     private static final Color TEXT = new Color(220, 224, 232);
+    private static final Color CHAIN_FILL = new Color(14, 18, 25);
 
     private static final int CATEGORY = 1, CHAIN = 2, ROW = 3;
 
@@ -82,9 +87,14 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         final int kind;
         String title = "", line2 = "", line3 = "", status = "", status2 = "", icon;
         Color titleColor = TEXT, line2Color = DIM, statusColor = DIM;
-        boolean done, hidden, chained, chainStart, chainEnd;
+        Color line3Color = GOLD;
+        boolean done, hidden, chained, chainStart, chainEnd, focus;
         int progress, goal;
         float y, h, titleH, line2H, line3H;
+        /** A chain heading: the bottom of its block, below its last step. */
+        float blockBottom;
+        /** A row: the id of its achievement, when it is one of this system's. */
+        String id;
 
         Item(int kind) {
             this.kind = kind;
@@ -100,6 +110,8 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         final List<Item> items = new ArrayList<>();
         int done, total;
         CustomPanelAPI container, content;
+        TooltipMakerAPI scroller;
+        float contentH;
         float contentLeft, contentTop, buttonY;
         boolean hover;
 
@@ -134,8 +146,18 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     private float tabsLeft, tabsTop, tabButtonW;
     private int tab;
     private boolean dismissed, wasLeftDown;
+    /** The achievement to show first: its tab is chosen and the list scrolled to it once. */
+    private final String focusId;
+    private Item focusItem;
+    private boolean focusScrolled;
+    private float focusGlow;
 
     public AchievementsPanel() {
+        this(null);
+    }
+
+    public AchievementsPanel(String focusId) {
+        this.focusId = focusId;
         float screenW = Global.getSettings().getScreenWidth();
         float screenH = Global.getSettings().getScreenHeight();
         panelW = Math.max(Math.min(1240f, screenW - 80f), Math.min(900f, screenW - 10f));
@@ -182,7 +204,17 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         buttons.add(new Btn("close", panelW - PAD - 120f, footY, 120f, FOOT_H));
         label(panel, "Close", Color.WHITE, panelW - PAD - 120f, footY + (FOOT_H - 18f) / 2f, 120f, 18f,
                 Fonts.DEFAULT_SMALL, Alignment.MID);
-        showTab(0);
+        int first = 0;
+        for (int i = 0; i < tabs.size() && focusId != null; i++) {
+            for (Item item : tabs.get(i).items) {
+                if (focusId.equals(item.id)) {
+                    first = i;
+                    focusItem = item;
+                    item.focus = true;
+                }
+            }
+        }
+        showTab(first);
     }
 
     // ---- which tabs there are ----
@@ -246,13 +278,15 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             }
 
             Item row = new Item(ROW);
+            row.id = spec.id;
             row.icon = spec.icon;
             row.done = spec.isDone();
+            String rewards = RewardLines.text(spec);
             if (row.done) {
                 row.title = spec.name;
                 row.titleColor = Color.WHITE;
                 row.line2 = AchievementNoticeIntel.body(spec);
-                row.line3 = spec.reward;
+                row.line3 = rewards;
                 row.status = "Done";
                 row.statusColor = GREEN;
                 String date = Achievements.doneDate(spec.id);
@@ -260,11 +294,19 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             } else {
                 boolean revealed = spec.isRevealed();
                 row.hidden = !revealed && !howTo;
-                row.title = howTo ? spec.howTo : revealed ? spec.hint : "???";
                 row.titleColor = DIM;
-                if (howTo && !spec.reward.isEmpty()) {
-                    row.line2 = spec.reward;
-                    row.line2Color = FAINT;
+                if (row.hidden) {
+                    // A secret one, or a step of a chain whose step before is not done yet.
+                    row.title = spec.secret ? SECRET_TITLE : "Next step";
+                    if (!spec.secret) {
+                        row.line2 = "Shows once the step before it is done.";
+                        row.line2Color = FAINT;
+                    }
+                } else {
+                    row.title = spec.name;
+                    row.line2 = howTo ? spec.howTo : spec.hint;
+                    row.line3 = rewards;
+                    row.line3Color = FAINT;
                 }
                 if (spec.isCounted() && !row.hidden) {
                     row.goal = spec.goal;
@@ -282,23 +324,15 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         }
         if (lastChained != null) lastChained.chainEnd = true;
 
-        // A heading names the other system only where the tab mixes systems.
-        Set<String> sources = new LinkedHashSet<>();
-        for (ExternalAchievement a : t.externals) sources.add(a.source);
-        boolean nameSources = !t.specs.isEmpty() || sources.size() > 1;
-        String source = null;
+        // What other systems keep (MagicLib, milestones) follows as plain rows of the same tab, no heading.
         for (ExternalAchievement a : t.externals) {
-            if (nameSources && !a.source.equals(source)) {
-                source = a.source;
-                if (!source.isEmpty()) t.items.add(heading(CATEGORY, source));
-            }
             Item row = new Item(ROW);
             row.icon = a.icon.isEmpty() ? Ids.ICON : a.icon;
             row.done = a.done;
-            row.hidden = a.hidden;
-            row.title = a.hidden || a.name.isEmpty() ? "???" : a.name;
+            row.hidden = a.hidden && !a.done;
+            row.title = row.hidden || a.name.isEmpty() ? SECRET_TITLE : a.name;
             row.titleColor = a.done ? Color.WHITE : DIM;
-            row.line2 = a.hidden ? "" : a.description;
+            row.line2 = row.hidden ? "" : a.description;
             row.line2Color = a.done ? DIM : FAINT;
             if (a.done) {
                 row.status = "Done";
@@ -390,12 +424,16 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     /** Lays the items out top to bottom, then builds the container, the scroller and every label. */
     private void build(Tab t) {
         float y = GAP;
+        Item chainHeading = null;
         for (Item item : t.items) {
             if (item.kind == CATEGORY) {
                 if (y > GAP) y += 6f;
                 item.h = CATEGORY_H;
             } else if (item.kind == CHAIN) {
+                if (y > GAP) y += CHAIN_GAP;
+                y += 4f;
                 item.h = CHAIN_H;
+                chainHeading = item;
             } else {
                 float w = textW(item);
                 item.titleH = measure(item.title, Fonts.INSIGNIA_LARGE, w);
@@ -412,8 +450,14 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             }
             item.y = y;
             y += item.h + GAP;
+            if (item.kind == ROW && item.chainEnd && chainHeading != null) {
+                chainHeading.blockBottom = item.y + item.h + CHAIN_PAD;
+                y += CHAIN_PAD + CHAIN_GAP;
+                chainHeading = null;
+            }
         }
         float contentH = Math.max(listH, y + GAP);
+        t.contentH = contentH;
 
         t.container = panel.createCustomPanel(listW, listH, null);
         panel.addComponent(t.container).inTL(HIDDEN_X, listTop);
@@ -421,6 +465,7 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         t.contentTop = listTop;
 
         TooltipMakerAPI scroller = t.container.createUIElement(listW, listH, true);
+        t.scroller = scroller;
         t.content = t.container.createCustomPanel(listW, contentH, null);
         for (Item item : t.items) addLabels(t.content, item);
         scroller.addCustom(t.content, 0f);
@@ -449,7 +494,7 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
             wrapped(content, item.line2, item.line2Color, Fonts.DEFAULT_SMALL, x, y, w);
             y += item.line2H + LINE_GAP;
         }
-        if (!item.line3.isEmpty()) wrapped(content, item.line3, GOLD, Fonts.DEFAULT_SMALL, x, y, w);
+        if (!item.line3.isEmpty()) wrapped(content, item.line3, item.line3Color, Fonts.DEFAULT_SMALL, x, y, w);
 
         // The status sits right of the text: one line centred, or two lines (or a line and a bar).
         float statusX = contentW() - STATUS_W - TEXT_GAP;
@@ -521,8 +566,21 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         return mx >= x && mx <= x + w && my >= y && my <= y + h;
     }
 
+    /** Scrolls the shown list so the focused row sits near the top, once the scroller exists. */
+    private void scrollToFocus() {
+        if (focusScrolled || focusItem == null || tabs.isEmpty()) return;
+        Tab t = tabs.get(tab);
+        if (t.scroller == null || t.scroller.getExternalScroller() == null) return;
+        focusScrolled = true;
+        float offset = Math.max(0f, Math.min(t.contentH - listH, focusItem.y - 40f));
+        t.scroller.getExternalScroller().setYOffset(offset);
+        focusGlow = 3f;
+    }
+
     @Override
     public void advance(float amount) {
+        scrollToFocus();
+        if (focusGlow > 0f) focusGlow = Math.max(0f, focusGlow - amount);
         updateContent();
         if (dismissed || position == null || !Mouse.isCreated()) return;
         float scale = Global.getSettings().getScreenScaleMult();
@@ -689,6 +747,13 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         clip(listX, listTop, listW, listH);
         float left = t.contentLeft, w = contentW();
         for (Item item : t.items) {
+            if (item.kind != CHAIN || item.blockBottom <= 0f) continue;
+            float top = t.contentTop + item.y - 6f, h = item.blockBottom - item.y + 6f;
+            if (top + h < listTop || top > listTop + listH) continue;
+            rect(left + 2f, top, w - 4f, h, CHAIN_FILL, alpha * 0.8f);
+            frame(left + 2f, top, w - 4f, h, DIM, 1f, alpha * 0.22f);
+        }
+        for (Item item : t.items) {
             float top = t.contentTop + item.y;
             if (top + item.h + GAP < listTop || top - GAP > listTop + listH) continue;
             if (item.kind == CATEGORY) {
@@ -719,6 +784,12 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         if (item.done) drawIcon(item.icon, iconX, iconY, ICON, Color.WHITE, alpha);
         else drawIcon(item.icon, iconX, iconY, ICON, new Color(170, 170, 170), alpha * (item.hidden ? 0.12f : 0.35f));
         frame(iconX, iconY, ICON, ICON, item.done ? GOLD : DIM, 1f, alpha * (item.done ? 0.7f : 0.3f));
+
+        if (item.focus) {
+            // The achievement an intel entry pointed at: a gold frame that pulses, then stays.
+            float pulse = focusGlow > 0f ? 0.55f + 0.45f * (float) Math.abs(Math.sin(focusGlow * 3.0)) : 0.6f;
+            frame(left + indent, top, w - indent, item.h, GOLD, 2f, alpha * pulse);
+        }
 
         if (item.goal > 1 && !item.done) {
             float barX = left + w - TEXT_GAP - BAR_W, barY = top + item.h / 2f + 6f;

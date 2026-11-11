@@ -21,9 +21,19 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
     private static final String OPTION_CLOSE = "acr_close";
     private static final String OPTION_OPEN = "acr_open";
 
+    /** The achievement to show first, or null. */
+    private final String focusId;
     private InteractionDialogAPI dialog;
     private boolean closeRequested;
     private boolean dismissed;
+
+    public AchievementsDialog() {
+        this(null);
+    }
+
+    public AchievementsDialog(String focusId) {
+        this.focusId = focusId;
+    }
 
     @Override
     public void init(InteractionDialogAPI dialog) {
@@ -37,7 +47,7 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
     private void showList() {
         // Fresh counts for the progress shown in the list.
         Tracker.check();
-        AchievementsPanel list = new AchievementsPanel();
+        AchievementsPanel list = new AchievementsPanel(focusId);
         dialog.showCustomVisualDialog(list.width(), list.height(),
                 new AchievementsDelegate(list, () -> closeRequested = true));
     }

@@ -63,7 +63,7 @@ public final class AchievementNoticeIntel extends BaseIntelPlugin {
     @Override
     public void createIntelInfo(TooltipMakerAPI info, ListInfoMode mode) {
         info.addPara(getName(), getTitleColor(mode), 0f);
-        if (!spec.reward.isEmpty()) info.addPara(spec.reward, Misc.getGrayColor(), 3f);
+        for (String line : RewardLines.of(spec)) info.addPara(line, Misc.getGrayColor(), 3f);
     }
 
     @Override
@@ -71,16 +71,16 @@ public final class AchievementNoticeIntel extends BaseIntelPlugin {
         float pad = 10f;
         String body = body(spec);
         if (!body.isEmpty()) info.addPara(body, pad);
-        if (!spec.reward.isEmpty()) info.addPara(spec.reward, Misc.getHighlightColor(), pad);
+        for (String line : RewardLines.of(spec)) info.addPara(line, Misc.getHighlightColor(), pad);
         info.addPara(spec.tabName(), Misc.getGrayColor(), pad);
-        info.addButton("Open the list", BUTTON_OPEN, width, 24f, pad * 2f);
+        info.addButton("Show it in the list", BUTTON_OPEN, width, 24f, pad * 2f);
         addDeleteButton(info, width);
     }
 
     @Override
     public void buttonPressConfirmed(Object buttonId, IntelUIAPI ui) {
         if (BUTTON_OPEN.equals(buttonId)) {
-            Achievements.openList(ui);
+            Achievements.openList(ui, spec.id);
             return;
         }
         super.buttonPressConfirmed(buttonId, ui);

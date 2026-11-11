@@ -1,3 +1,15 @@
+Version 0.5.0 (2026-11-12)
+- The list opens from the new Achievements button on the ability bar, or with a hotkey (K, set in LunaLib). The Achievements entry on the intel screen is gone.
+- The intel entry of a new achievement has a Show it in the list button that opens its tab, scrolled to it and marked.
+- Every achievement shows its name, with the hint under it until it is done. Secret ones read Secret Achievement instead of ???. A chain step not reached yet reads Next step.
+- MagicLib achievements sit among the others in their mod's tab, without a MagicLib heading.
+- What an achievement pays or unlocks in other mods shows under it, done or not: Rule Book rules, and New Game Plus career points once New Game Plus supports it.
+- Chains have more space around them and padding below the last step.
+- Achievements that can be done in any order are no longer chains: the colony ones, the Reverse Engineered Private Arsenal ones, Destroy a shrouded ship (Sol Renewed), and the quests of Nexerelin, Sephira Conclave (Missing Aces, False Flag Operation) and Emergent Threats.
+- Enter 25 star systems is replaced by a chain: visit 25%, 50% and 100% of the Sector's star systems in one campaign. Hidden systems do not count.
+- Defeat an Omega, Threat or Dweller fleet is now three achievements: Defeat a Shrouded Dweller fleet (it keeps the Rule Book unlock), Defeat an Omega fleet and Defeat a Threat fleet.
+- For modders: Achievements.addRewardText adds a line under achievements (what your mod gives for them), and Achievements.openList(ui, id) opens the list at one achievement.
+
 Version 0.4.0 (2026-11-11)
 - 157 achievements for the quests, story missions and named bounties of 37 other mods, such as Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab and Emergent Threats. Each sits in the tab of its mod and shows only while that mod is on.
 - The New Game Plus - Renewed feats about other mods are among them, with the same names, so they also show without New Game Plus and count once.
