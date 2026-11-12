@@ -79,6 +79,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.5.2[/b]
+[list][li]Every word of every achievement name starts with a capital letter.[/li][/list]
 [b]0.5.1[/b]
 [list][li]Every achievement has a new name, and many have a new hint.[/li][li]Removed: Destroy a shrouded ship (Sol Renewed), Start with a Starter Pack (StarterPack) and Sign a contract (Missions - Renewed).[/li][/list]
 [b]0.5.0[/b]

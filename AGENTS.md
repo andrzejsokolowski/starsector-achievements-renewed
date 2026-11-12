@@ -77,7 +77,8 @@ more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everythi
 - Names and hints are Andrzej's, from his review of all 214 (0.5.1, artifact
   https://claude.ai/artifact/7xQg5jKtmXkJzSwGAXe7tr, collection `reviews`). Many names are jokes and
   pop-culture references on purpose. Do not "fix" them into plain descriptions; only fix typos, and ask him
-  before changing a name. `ngp_*` rows also need New Game Plus's ngp_feats.csv.
+  before changing a name. Every word of a name starts with a capital ("One For My Baby", Andrzej 2026-11-12);
+  letters he wrote in capitals stay ("You WILL Dress Up For Me Now"). `ngp_*` rows also need New Game Plus's ngp_feats.csv.
 - 0.5.1 removed `rbr_sol_shroud`, `rbr_starterpack` and `rbr_contract` on his word ("remove this
   achievement"). None had a Rule Book unlock.
 
