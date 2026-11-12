@@ -92,6 +92,9 @@ the quest's mod leaves in the save (memory keys, persistent data, a person's, fa
 skill), found in that mod's files (2026-11-11 research, not checked in game). `tab` is the mod's own name from
 its mod_info.json, so the rows join that mod's MagicLib achievements. A quest whose mod already has its own
 MagicLib achievement for it is left out unless New Game Plus has it.
+0.6.0 (ACR-11): 9 `acr_q_tania_*` rows for Navarchy of Tania 1.4.0 (`navarchy_of_tania`), names and hints from
+Andrzej's review (artifact https://claude.ai/artifact/RFABwRAEAYyyZhfqdsFSKS). Rescuing Maria Machado is not in:
+the mod writes it to the defeated fleet's memory, which is gone afterwards.
 
 ## Writing
 

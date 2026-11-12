@@ -24,7 +24,7 @@ Achievements for the Starsector campaign, kept across all your saves. For Starse
   save. It keeps none of its own classes in the save, so the save still loads without it.
 
 The mod comes with 40 achievements for the base game (story missions, colonies, battles and more) and 14
-for Oddisz's other mods, plus 157 for the quests and named bounties of 37 other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
+for Oddisz's other mods, plus 166 for the quests and named bounties of 38 other mods, each in that mod's tab and only while that mod is on. Some unlock Rule Book - Renewed's
 rules; their reward line shows only while Rule Book is on.
 
 Licence: CC0 1.0 (see `LICENSE`). Do what you like with it.

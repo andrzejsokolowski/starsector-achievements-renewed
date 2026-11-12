@@ -42,7 +42,7 @@ Needs LunaLib.
 [hr][center][size=12pt][b]Achievements for other mods[/b][/size][/center][hr]
 [list]
 [li]Many mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
-[li]Quests, story missions and named bounties of 37 mods, for example Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab, Emergent Threats, Halo Dynamics, Lost.Sector, Knights of Ludd and United Aurora Federation.[/li]
+[li]Quests, story missions and named bounties of 38 mods, for example Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab, Emergent Threats, Halo Dynamics, Lost.Sector, Knights of Ludd and United Aurora Federation.[/li]
 [li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
 [/list]
 
@@ -79,6 +79,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.6.0[/b]
+[list][li]9 achievements for the quests of Navarchy of Tania: the classified missions Whiskey, Foxtrot and Charlie, The Lurking Death and the Vela beacon.[/li][/list]
 [b]0.5.2[/b]
 [list][li]Every word of every achievement name starts with a capital letter.[/li][/list]
 [b]0.5.1[/b]
