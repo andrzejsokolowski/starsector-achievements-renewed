@@ -43,7 +43,7 @@ Needs LunaLib.
 [list]
 [li]Many mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
 [li]Quests, story missions and named bounties of 37 mods, for example Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab, Emergent Threats, Halo Dynamics, Lost.Sector, Knights of Ludd and United Aurora Federation.[/li]
-[li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, StarterPack, Missions - Renewed, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
+[li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
 [/list]
 
 [hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
@@ -79,6 +79,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.5.1[/b]
+[list][li]Every achievement has a new name, and many have a new hint.[/li][li]Removed: Destroy a shrouded ship (Sol Renewed), Start with a Starter Pack (StarterPack) and Sign a contract (Missions - Renewed).[/li][/list]
 [b]0.5.0[/b]
 [list][li]The list opens from the new Achievements button on the ability bar, or with a hotkey (K, set in LunaLib). The Achievements entry on the intel screen is gone.[/li][li]The intel entry of a new achievement has a Show it in the list button that opens its tab, scrolled to it and marked.[/li][li]Every achievement shows its name, with the hint under it until it is done. Secret ones read Secret Achievement instead of ???. A chain step not reached yet reads Next step.[/li][li]MagicLib achievements sit among the others in their mod's tab, without a MagicLib heading.[/li][li]What an achievement pays or unlocks in other mods shows under it, done or not: Rule Book rules, and New Game Plus career points once New Game Plus supports it.[/li][li]Chains have more space around them and padding below the last step.[/li][li]Achievements that can be done in any order are no longer chains: the colony ones, the Reverse Engineered Private Arsenal ones, Destroy a shrouded ship (Sol Renewed), and the quests of Nexerelin, Sephira Conclave (Missing Aces, False Flag Operation) and Emergent Threats.[/li][li]Enter 25 star systems is replaced by a chain: visit 25%, 50% and 100% of the Sector's star systems in one campaign. Hidden systems do not count.[/li][li]Defeat an Omega, Threat or Dweller fleet is now three achievements: Defeat a Shrouded Dweller fleet (it keeps the Rule Book unlock), Defeat an Omega fleet and Defeat a Threat fleet.[/li][li]For modders: Achievements.addRewardText adds a line under achievements (what your mod gives for them), and Achievements.openList(ui, id) opens the list at one achievement.[/li][/list]
 [b]0.4.0[/b]

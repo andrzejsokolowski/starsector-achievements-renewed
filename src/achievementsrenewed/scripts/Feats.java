@@ -8,7 +8,6 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.SpecialItemData;
 import com.fs.starfarer.api.campaign.StarSystemAPI;
-import com.fs.starfarer.api.campaign.comm.IntelInfoPlugin;
 import com.fs.starfarer.api.campaign.econ.Industry;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.campaign.rules.MemoryAPI;
@@ -80,7 +79,6 @@ public final class Feats {
         // Oddisz's other mods.
         flag("rbr_sol_reach", Feats::inSol);
         flag("rbr_sol_quest", () -> "DONE".equals(sectorString("$sr_quest_stage")));
-        flag("rbr_sol_shroud", () -> sector("$sr_quest_shroud_killed"));
         flag("rbr_sol_crisis", () -> sector("$sr_crisis_deterred"));
         COUNTS.put("rbr_gd_wins", () -> persistentInt("gd_wins"));
         COUNTS.put("rbr_gd_pulls", () -> persistentInt("gd_pulls"));
@@ -89,8 +87,6 @@ public final class Feats {
                 () -> playerIndustryWith("oddisz_cloning_megafactory", "omega_core", "pristine_nanoforge"));
         flag("rbr_arsenal_weapons", () -> sectorSetSize("$RePA_ProducedWeapons") >= 10);
         flag("rbr_arsenal_ship", () -> sectorSetSize("$RePA_ProducedShips") >= 1);
-        flag("rbr_starterpack", () -> Global.getSector().getPersistentData().get("$starterpack_applied") != null);
-        flag("rbr_contract", () -> hasIntelOf("missionsrenewed.missions.ContractIntel"));
         flag("rbr_aar_ascended", () -> playerMarketMemory("$aar_ascended"));
         flag("rbr_aar_ecumenopolis", () -> playerCondition("aar_ecumenopolis"));
         flag("rbr_oce_tutelage", () -> officerMemory("$oce_omegaTutelage"));
@@ -220,15 +216,5 @@ public final class Feats {
         CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
         StarSystemAPI system = fleet == null ? null : fleet.getStarSystem();
         return system != null && system.getMemoryWithoutUpdate().contains("$sr_sol");
-    }
-
-    /** True when an intel of this class, or of a class built on it, is in the intel screen. */
-    private static boolean hasIntelOf(String className) {
-        for (IntelInfoPlugin intel : Global.getSector().getIntelManager().getIntel()) {
-            for (Class<?> c = intel.getClass(); c != null; c = c.getSuperclass()) {
-                if (c.getName().equals(className)) return true;
-            }
-        }
-        return false;
     }
 }

@@ -1,3 +1,7 @@
+Version 0.5.1 (2026-11-12)
+- Every achievement has a new name, and many have a new hint.
+- Removed: Destroy a shrouded ship (Sol Renewed), Start with a Starter Pack (StarterPack) and Sign a contract (Missions - Renewed).
+
 Version 0.5.0 (2026-11-12)
 - The list opens from the new Achievements button on the ability bar, or with a hotkey (K, set in LunaLib). The Achievements entry on the intel screen is gone.
 - The intel entry of a new achievement has a Show it in the list button that opens its tab, scrolled to it and marked.

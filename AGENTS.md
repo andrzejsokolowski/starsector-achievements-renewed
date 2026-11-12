@@ -71,9 +71,12 @@ more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everythi
 - `acr_systems25` is gone; `acr_systems_25/50/100` (`scripts/SystemsExplored`, percent of non-hidden systems).
 - `api/RewardText` + `Achievements.addRewardText`: other mods add a line under achievements (New Game Plus:
   career points). Contract from 0.5.0. Identical lines show once.
-- Names and hints: Andrzej reviews every one in the artifact https://claude.ai/artifact/7xQg5jKtmXkJzSwGAXe7tr
-  (database collection `reviews`, one document per id: name/hint approved or rejected, nameNew, hintNew,
-  note). Apply his answers to `achievements.csv`; `ngp_*` rows also need New Game Plus's ngp_feats.csv.
+- Names and hints are Andrzej's, from his review of all 214 (0.5.1, artifact
+  https://claude.ai/artifact/7xQg5jKtmXkJzSwGAXe7tr, collection `reviews`). Many names are jokes and
+  pop-culture references on purpose. Do not "fix" them into plain descriptions; only fix typos, and ask him
+  before changing a name. `ngp_*` rows also need New Game Plus's ngp_feats.csv.
+- 0.5.1 removed `rbr_sol_shroud`, `rbr_starterpack` and `rbr_contract` on his word ("remove this
+  achievement"). None had a Rule Book unlock.
 
 ## Quest achievements (0.4.0)
 
@@ -90,7 +93,8 @@ MagicLib achievement for it is left out unless New Game Plus has it.
 
 Player-facing text is short and plain, in the game's own tone. No flavour lines, no explaining paragraphs.
 A hint is one short line that points at the achievement without naming it. The how-to line states the exact
-condition. The name says what the player did ("Win 10 battles").
+condition. The name is Andrzej's (often a joke or a reference); for a new achievement, propose one and let
+him decide.
 
 ## Clean room
 
