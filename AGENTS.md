@@ -20,6 +20,9 @@ and the listener, so those are contract too.
 Rule Book - Renewed 0.11.0 reads `data/config/achievements_renewed/achievements.csv` of this mod (next door, or
 the installed copy) in its build to check the `rbr_*` ids, and needs this mod 0.3.0 or newer: keep that path and
 the script name `achievementsrenewed.scripts.FeatScript`.
+Since Rule Book 0.12.1 its challenge goals and README show the `howTo` text (not the name, which is a joke now)
+of the achievements it uses: `rbr_abyss`, `acr_level15`, `rbr_oce_tutelage`, `rbr_colony6`, `rbr_sol_quest`,
+`rbr_aar_ascended`, `rbr_gd_wins`, `rbr_atg`, `rbr_colonies5`. Keep `howTo` filled for those, and for every row.
 
 This mod itself pays nothing: no career points, no rewards. A mod that wants to reward an achievement does
 it in its own listener. New Game Plus - Renewed (0.7.0 on) pays career points that way, once per profile, for
