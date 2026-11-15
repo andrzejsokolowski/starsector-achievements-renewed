@@ -62,8 +62,9 @@ more), and `rbr_great_mall` (id kept) is now the Gate of Babylon of The Everythi
   and the LunaLib hotkey `acr_hotkey` (`campaign/HotkeyListener`, default K). The intel screen has no
   Achievements entry any more. `campaign/AbilityKeeper` keeps the ability out of the save like IntelKeeper
   does with intel: before a save it takes the ability off the bar and the player and keeps its slots as
-  text (`acr_abilitySlots`), after the save and on load it gives it back. It is put on the bar once per save
-  (`acr_abilityPlaced`); a player who removes it from the bar keeps it off.
+  text (`acr_abilitySlots`), after the save and on load it gives it back. Since 0.7.1 it is never put on the bar
+  by this mod (Andrzej, 2026-11-15: "Put it in the list of selectable skills, just dont immediately on the
+  hotbar"); the player adds it from the ability list. `acr_abilityPlaced` in old saves is unused.
 - Rows show name + hint until done. Secret ones read "Secret Achievement" (never ???). MagicLib rows have no
   source heading. Chains have a block with space around it.
 - A chain is only for steps that must come in order (a count, or a quest that needs the one before). Steps

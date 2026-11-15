@@ -2,7 +2,6 @@ package achievementsrenewed.campaign;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
@@ -13,16 +12,14 @@ import com.fs.starfarer.api.campaign.PersistentUIDataAPI.AbilitySlotsAPI;
  * Gives the player the Achievements ability and keeps it out of the save file, as IntelKeeper does with
  * the intel entries: before a save the ability is taken off the bar and off the player, and the slots it
  * sat in are kept in the save as plain text; after the save (and on load) it goes back to the same slots.
- * The first time a save sees this mod the ability goes into the first free slot; once the player takes
- * it off the bar it stays off.
+ * The ability is never put on the bar by this mod: the player picks it from the ability list (Andrzej,
+ * 2026-11-15). Saves where it was put on the bar before 0.7.1 keep it there.
  */
 public final class AbilityKeeper {
 
     public static final String ABILITY_ID = "acr_achievements";
     /** Sector persistent data: slots the ability sat in, as "bar:slot:n" (normal) or "bar:slot:h" (hyperspace). */
     private static final String DATA_SLOTS = "acr_abilitySlots";
-    /** Sector persistent data: the ability has been put on the bar once in this save. */
-    private static final String DATA_PLACED = "acr_abilityPlaced";
     private static final int BARS = 5;
 
     private AbilityKeeper() {}
@@ -36,13 +33,7 @@ public final class AbilityKeeper {
             }
             if (fleet != null && !fleet.hasAbility(ABILITY_ID)) fleet.addAbility(ABILITY_ID);
 
-            Map<String, Object> data = Global.getSector().getPersistentData();
-            if (data.get(DATA_PLACED) == null) {
-                data.put(DATA_PLACED, "true");
-                if (findSlots().isEmpty()) placeInFreeSlot();
-            } else {
-                restoreSlots();
-            }
+            restoreSlots();
         } catch (Throwable t) {
             Global.getLogger(AbilityKeeper.class).error("Achievements: could not add the ability", t);
         }
@@ -105,14 +96,6 @@ public final class AbilityKeeper {
             return false;
         });
         return found;
-    }
-
-    private static void placeInFreeSlot() {
-        forEachSlot((bar, slot) -> {
-            if (slot.getAbilityId() != null || slot.getInHyperAbilityId() != null) return false;
-            slot.setAbilityId(ABILITY_ID);
-            return true;
-        });
     }
 
     private static void restoreSlots() {

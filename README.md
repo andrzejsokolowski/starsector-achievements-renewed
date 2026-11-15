@@ -2,8 +2,9 @@
 
 Achievements for the Starsector campaign, kept across all your saves. For Starsector 0.98a. Needs LunaLib.
 
-- **The list**: open it with the **Achievements** button on the ability bar, or with the hotkey (K by
-  default, LunaLib setting "Hotkey for the list").
+- **The list**: open it with the hotkey (K by
+  default, LunaLib setting "Hotkey for the list"), or with the **Achievements** ability: pick it from the
+  ability list to put it on your ability bar.
 - **Reset**: the **Reset achievements** button at the bottom of the list sets every achievement back to not
   done, for all saves, after you confirm. MagicLib achievements are not reset. What the current save still
   meets comes back at the next check.

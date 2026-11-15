@@ -13,7 +13,7 @@ Needs LunaLib.
 
 [hr][center][size=12pt][b]How it works[/b][/size][/center][hr]
 [list]
-[li]Open the list with the Achievements button on the ability bar, or with the hotkey (K, set in LunaLib).[/li]
+[li]Open the list with the hotkey (K, set in LunaLib), or put the Achievements ability on your ability bar.[/li]
 [li]Reset achievements, at the bottom of the list, sets every achievement back to not done after you confirm.[/li]
 [li]The first tab, Achievements, holds the base game's achievements. Every mod with achievements has a tab of its own, in alphabetical order.[/li]
 [li]An achievement you do not have shows its name and a hint. Secret ones show nothing until done. The LunaLib setting "Show how to get achievements" shows the exact condition instead, secret ones included.[/li]
@@ -80,6 +80,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]0.7.1[/b]
+[list][li]The Achievements ability no longer puts itself on the ability bar in a new game. Pick it from the ability list if you want it there.[/li][/list]
 [b]0.7.0[/b]
 [list][li]A Reset achievements button at the bottom of the list sets every achievement back to not done, for all saves, after you confirm. MagicLib achievements are not reset.[/li][/list]
 [b]0.6.0[/b]

@@ -1,3 +1,6 @@
+Version 0.7.1 (2026-11-15)
+- The Achievements ability no longer puts itself on the ability bar in a new game. Pick it from the ability list if you want it there.
+
 Version 0.7.0 (2026-11-15)
 - A Reset achievements button at the bottom of the list sets every achievement back to not done, for all saves, after you confirm. MagicLib achievements are not reset.
 
