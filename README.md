@@ -1,6 +1,6 @@
 # Achievements - Renewed
 
-Achievements for the Starsector campaign, kept across all your saves. For Starsector 0.98a. Needs LunaLib.
+Achievements for the Starsector campaign, kept across all your saves. For Starsector 0.98.5a. Needs LunaLib.
 
 - **The list**: open it with the hotkey (K by
   default, LunaLib setting "Hotkey for the list"), or with the **Achievements** ability: pick it from the
