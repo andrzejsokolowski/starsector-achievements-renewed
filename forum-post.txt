@@ -10,6 +10,14 @@ The base game has its own tab, and so has every mod that adds achievements.
 Other mods can add their own achievements and chains with one CSV file.
 Needs LunaLib.
 [/b][/center]
+[spoiler=Screenshots]
+[center][img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/01-list-vaults-of-knowledge.webp?raw=true[/img]
+[img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/02-list-secret-achievements.webp?raw=true[/img]
+[img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/03-list-domain-phase-lab-career-points.webp?raw=true[/img]
+[img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/04-list-liminal.webp?raw=true[/img]
+[img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/05-list-rule-book-challenges.webp?raw=true[/img]
+[img]https://github.com/andrzejsokolowski/starsector-achievements-renewed/blob/main/screenshots/06-ability-button.png?raw=true[/img][/center]
+[/spoiler]
 
 [hr][center][size=12pt][b]How it works[/b][/size][/center][hr]
 [list]
