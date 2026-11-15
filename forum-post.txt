@@ -88,6 +88,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]1.0.0[/b]
+[list][li]Version 1.0.0: the mod is now considered stable. No gameplay changes.[/li][/list]
 [b]0.8.0[/b]
 [list][li]Updated for Starsector 0.98.5a.[/li][/list]
 [b]0.7.1[/b]
