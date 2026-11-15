@@ -84,6 +84,13 @@ public final class Store {
         }
     }
 
+    /** Forgets every achievement done, in every save, and writes the empty list. */
+    public static void clear() {
+        done = new LinkedHashMap<>();
+        unwritten = false;
+        write();
+    }
+
     public static boolean isDone(String id) {
         return done().containsKey(id);
     }

@@ -4,6 +4,9 @@ Achievements for the Starsector campaign, kept across all your saves. For Starse
 
 - **The list**: open it with the **Achievements** button on the ability bar, or with the hotkey (K by
   default, LunaLib setting "Hotkey for the list").
+- **Reset**: the **Reset achievements** button at the bottom of the list sets every achievement back to not
+  done, for all saves, after you confirm. MagicLib achievements are not reset. What the current save still
+  meets comes back at the next check.
 - **Tabs**: the first tab, Achievements, holds the base game's achievements. Every mod with achievements
   has a tab of its own, in alphabetical order. Each tab shows how many you have.
 - **Hints**: an achievement you do not have is greyed out and shows its name and a hint. Secret ones read

@@ -1,3 +1,6 @@
+Version 0.7.0 (2026-11-15)
+- A Reset achievements button at the bottom of the list sets every achievement back to not done, for all saves, after you confirm. MagicLib achievements are not reset.
+
 Version 0.6.0 (2026-11-12)
 - 9 achievements for the quests of Navarchy of Tania: the classified missions Whiskey, Foxtrot and Charlie, The Lurking Death and the Vela beacon.
 

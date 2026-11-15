@@ -20,11 +20,13 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
 
     private static final String OPTION_CLOSE = "acr_close";
     private static final String OPTION_OPEN = "acr_open";
+    private static final String OPTION_RESET = "acr_reset";
+    private static final String OPTION_KEEP = "acr_keep";
 
     /** The achievement to show first, or null. */
     private final String focusId;
     private InteractionDialogAPI dialog;
-    private boolean closeRequested;
+    private boolean closeRequested, resetRequested;
     private boolean dismissed;
 
     public AchievementsDialog() {
@@ -38,16 +40,33 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
     @Override
     public void init(InteractionDialogAPI dialog) {
         this.dialog = dialog;
+        listOptions();
+        showList();
+    }
+
+    private void listOptions() {
+        dialog.getOptionPanel().clearOptions();
         dialog.getOptionPanel().addOption("Open the achievements", OPTION_OPEN);
         dialog.getOptionPanel().addOption("Close", OPTION_CLOSE);
         dialog.getOptionPanel().setShortcut(OPTION_CLOSE, Keyboard.KEY_ESCAPE, false, false, false, true);
-        showList();
+    }
+
+    /** The Reset button of the list: ask before anything is forgotten. */
+    private void askReset() {
+        dialog.getTextPanel().addPara("Reset every achievement to not done? This clears them for all your saves "
+                + "and cannot be undone. Achievements this save still meets come back at the next check. "
+                + "MagicLib achievements are not reset.");
+        dialog.getOptionPanel().clearOptions();
+        dialog.getOptionPanel().addOption("Reset achievements", OPTION_RESET);
+        dialog.getOptionPanel().addOption("Cancel", OPTION_KEEP);
+        dialog.getOptionPanel().setShortcut(OPTION_KEEP, Keyboard.KEY_ESCAPE, false, false, false, true);
     }
 
     private void showList() {
         // Fresh counts for the progress shown in the list.
         Tracker.check();
         AchievementsPanel list = new AchievementsPanel(focusId);
+        list.setOnReset(() -> resetRequested = true);
         dialog.showCustomVisualDialog(list.width(), list.height(),
                 new AchievementsDelegate(list, () -> closeRequested = true));
     }
@@ -56,6 +75,15 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
     public void optionSelected(String optionText, Object optionData) {
         if (OPTION_CLOSE.equals(optionData)) dismiss();
         else if (OPTION_OPEN.equals(optionData)) showList();
+        else if (OPTION_RESET.equals(optionData)) {
+            Tracker.reset();
+            dialog.getTextPanel().addPara("Achievements reset.");
+            listOptions();
+            showList();
+        } else if (OPTION_KEEP.equals(optionData)) {
+            listOptions();
+            showList();
+        }
     }
 
     @Override
@@ -64,7 +92,11 @@ public final class AchievementsDialog implements InteractionDialogPlugin {
 
     @Override
     public void advance(float amount) {
-        if (closeRequested) {
+        if (resetRequested && closeRequested) {
+            resetRequested = false;
+            closeRequested = false;
+            askReset();
+        } else if (closeRequested) {
             closeRequested = false;
             dismiss();
         }

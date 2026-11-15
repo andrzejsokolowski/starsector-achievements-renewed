@@ -142,6 +142,18 @@ public final class Tracker {
         return true;
     }
 
+    /**
+     * The reset button of the list: no achievement is done any more, in any save. What this save has done
+     * (battles won, counts) stays, so what it still meets comes back at the next check.
+     */
+    public static void reset() {
+        Store.clear();
+        if (Global.getSector() != null) IntelKeeper.clearNotices();
+        POLLED.clear();
+        publishCounts();
+        LOG.info("Achievements: reset, none done");
+    }
+
     public static int doneCount() {
         int done = 0;
         for (AchievementSpec spec : Catalog.all()) if (Store.isDone(spec.id)) done++;

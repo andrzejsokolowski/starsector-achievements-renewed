@@ -119,6 +119,22 @@ public final class IntelKeeper {
         }
     }
 
+    /** After a reset: every "Achievement: name" entry of this save goes. */
+    public static void clearNotices() {
+        try {
+            STASHED.clear();
+            SaveData.notices().clear();
+            IntelManagerAPI manager = Global.getSector().getIntelManager();
+            for (IntelInfoPlugin intel : new ArrayList<>(manager.getIntel())) {
+                if (!ours(intel)) continue;
+                ((AchievementNoticeIntel) intel).endImmediately();
+                manager.removeIntel(intel);
+            }
+        } catch (Throwable t) {
+            LOG.error("Achievements: could not clear the intel entries for the reset", t);
+        }
+    }
+
     /** Once a day: drop entries older than a month. */
     public static void prune() {
         try {

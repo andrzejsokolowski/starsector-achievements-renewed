@@ -165,4 +165,7 @@ achievement list (columns, ids, goals, `after`, script classes and built-in scri
   remove a scrolling TooltipMakerAPI from a panel (its scroller stays): hidden lists are moved off screen. Row backgrounds, icons, bars and buttons are
   drawn and hit-tested by the panel, which reads the content panel's real screen position each frame.
   Text heights are measured on labels in a panel that is never shown, before the content panel is made.
-  `AchievementsDialog` hosts it.
+  `AchievementsDialog` hosts it. The footer's Reset achievements button closes the screen, the dialog asks
+  to confirm, then `Tracker.reset()` empties the saves/common list (`Store.clear()`) and this save's intel
+  entries. Save data (wins, counts) stays, so what the save still meets comes back at the next check
+  (0.7.0, ACR-12, Andrzej "Yes, add it").

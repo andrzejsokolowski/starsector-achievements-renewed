@@ -151,6 +151,8 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
     private Item focusItem;
     private boolean focusScrolled;
     private float focusGlow;
+    /** Run when the Reset button is pressed, before the screen closes; the dialog asks to confirm. */
+    private Runnable onReset;
 
     public AchievementsPanel() {
         this(null);
@@ -168,6 +170,10 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         listTop = colTop + HEADER_H;
         listW = panelW - PAD - listX;
         listH = colH - HEADER_H;
+    }
+
+    public void setOnReset(Runnable onReset) {
+        this.onReset = onReset;
     }
 
     public float width() {
@@ -199,7 +205,13 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         float footY = panelH - PAD - FOOT_H;
         if (!Settings.showHowTo()) {
             label(panel, "Exact conditions: LunaLib setting \"Show how to get achievements\".", FAINT,
-                    PAD, footY + 9f, panelW - PAD * 2f - 140f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
+                    PAD, footY + 9f, panelW - PAD * 2f - 330f, 18f, Fonts.DEFAULT_SMALL, Alignment.LMID);
+        }
+        if (onReset != null) {
+            float resetX = panelW - PAD - 120f - 12f - 170f;
+            buttons.add(new Btn("reset", resetX, footY, 170f, FOOT_H));
+            label(panel, "Reset achievements", Color.WHITE, resetX, footY + (FOOT_H - 18f) / 2f, 170f, 18f,
+                    Fonts.DEFAULT_SMALL, Alignment.MID);
         }
         buttons.add(new Btn("close", panelW - PAD - 120f, footY, 120f, FOOT_H));
         label(panel, "Close", Color.WHITE, panelW - PAD - 120f, footY + (FOOT_H - 18f) / 2f, 120f, 18f,
@@ -600,6 +612,12 @@ public final class AchievementsPanel extends BaseCustomUIPanelPlugin {
         if (!clicked) return;
         for (Btn b : buttons) {
             if (b.hover && b.action.equals("close")) {
+                close();
+                return;
+            }
+            if (b.hover && b.action.equals("reset") && onReset != null) {
+                Global.getSoundPlayer().playUISound("ui_button_pressed", 1f, 0.6f);
+                onReset.run();
                 close();
                 return;
             }
