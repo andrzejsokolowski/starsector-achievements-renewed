@@ -52,7 +52,7 @@ Needs LunaLib.
 [list]
 [li]Many mods get achievements here even though they add none themselves, each in that mod's tab and only while that mod is on.[/li]
 [li]Quests, story missions and named bounties of 38 mods, for example Nexerelin, Secrets of the Frontier, Sephira Conclave, Crab Shack, Domain Phase Lab, Emergent Threats, Halo Dynamics, Lost.Sector, Knights of Ludd and United Aurora Federation.[/li]
-[li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, Astral Ascension Renewed, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
+[li]Oddisz's mods too: Sol Renewed, Gambling Den, Cloning, Reverse Engineered Private Arsenal, Colonial Hypergrowth, Omega Core Everywhere, The Everything Shop and New Game Plus - Renewed.[/li]
 [/list]
 
 [hr][center][size=12pt][b]Works with[/b][/size][/center][hr]
@@ -88,6 +88,8 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 [/spoiler]
 
 [spoiler=Version log]
+[b]1.0.1[/b]
+[list][li]Astral Ascension Renewed is now called Colonial Hypergrowth: its achievements are in a tab of the new name.[/li][/list]
 [b]1.0.0[/b]
 [list][li]Version 1.0.0: the mod is now considered stable. No gameplay changes.[/li][/list]
 [b]0.8.0[/b]
