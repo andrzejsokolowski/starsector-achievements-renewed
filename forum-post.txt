@@ -89,7 +89,7 @@ This mod is under the CC0 1.0 (Creative Commons Zero) License, allowing you to d
 
 [spoiler=Version log]
 [b]1.0.1[/b]
-[list][li]Astral Ascension Renewed is now called Colonial Hypergrowth: its achievements are in a tab of the new name.[/li][/list]
+[list][li]Colonial Hypergrowth's achievements are in a tab named Colonial Hypergrowth.[/li][/list]
 [b]1.0.0[/b]
 [list][li]Version 1.0.0: the mod is now considered stable. No gameplay changes.[/li][/list]
 [b]0.8.0[/b]

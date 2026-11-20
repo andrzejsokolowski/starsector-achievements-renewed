@@ -1,5 +1,5 @@
 Version 1.0.1 (2026-11-17)
-- Astral Ascension Renewed is now called Colonial Hypergrowth: its achievements are in a tab of the new name.
+- Colonial Hypergrowth's achievements are in a tab named Colonial Hypergrowth.
 
 Version 1.0.0 (2026-11-15)
 - Version 1.0.0: the mod is now considered stable. No gameplay changes.
